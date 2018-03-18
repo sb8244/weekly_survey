@@ -1,0 +1,16 @@
+@import "simple-grid";
+
+.survey-wrapper {
+  margin-bottom: 80px;
+}
+
+.survey-answers {
+  &__header {
+    font-weight: 600;
+    border-bottom: 1px solid #bbb;
+  }
+
+  &__discussion {
+    margin-bottom: 15px;
+  }
+}

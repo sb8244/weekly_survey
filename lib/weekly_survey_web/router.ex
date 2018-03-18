@@ -16,7 +16,7 @@ defmodule WeeklySurveyWeb.Router do
   scope "/", WeeklySurveyWeb do
     pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/", SurveyListController, :index
   end
 
   # Other scopes may use custom stacks.

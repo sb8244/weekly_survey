@@ -1,0 +1,27 @@
+<div class="container">
+  <h2>Available Surveys</h2>
+
+  <%= for survey <- @surveys do %>
+    <div class="survey-wrapper">
+      <h3><%= survey.question %></h3>
+
+      <div class="row survey-answers__header">
+        <div class="col-4">Ideas</div>
+        <div class="col-4">Why</div>
+        <div class="col-4">&nbsp;</div>
+      </div>
+
+      <%= for answer <- survey.answers do %>
+        <div class="row survey-answers__answer">
+          <div class="col-4"><%= answer.answer %></div>
+          <div class="col-4">
+            <%= for discussion <- answer.discussions do %>
+              <div class="survey-answers__discussion"><%= discussion %></div>
+            <% end %>
+          </div>
+          <div class="col-4"></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
