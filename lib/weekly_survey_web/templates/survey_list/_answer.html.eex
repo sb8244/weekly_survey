@@ -1,0 +1,13 @@
+<div class="row survey-answers__answer">
+  <div class="col-4"><%= @answer.answer %></div>
+  <div class="col-4">
+    <%= for discussion <- @answer.discussions do %>
+      <div class="survey-answers__discussion"><%= discussion %></div>
+    <% end %>
+
+    <div class="survey-answers__discussion survey-answers__discussion-form-wrapper">
+      <a href="#">+ Add discussion</a>
+    </div>
+  </div>
+  <div class="col-4"></div>
+</div>

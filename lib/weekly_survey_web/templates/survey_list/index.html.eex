@@ -12,16 +12,14 @@
       </div>
 
       <%= for answer <- survey.answers do %>
-        <div class="row survey-answers__answer">
-          <div class="col-4"><%= answer.answer %></div>
-          <div class="col-4">
-            <%= for discussion <- answer.discussions do %>
-              <div class="survey-answers__discussion"><%= discussion %></div>
-            <% end %>
-          </div>
-          <div class="col-4"></div>
-        </div>
+        <%= render "_answer.html", answer: answer %>
       <% end %>
+
+      <div class="row survey-answers__answer-form-wrapper">
+        <div class="col-4">
+          <a href="#">+ Add Answer</a>
+        </div>
+      </div>
     </div>
   <% end %>
 </div>
