@@ -18,12 +18,12 @@
         <div class="col-5">
           <div class="inline-form">
             <a href="#">+ Add Answer</a>
-            <form class="hidden" method="POST">
-              <input type="hidden" name="survey_id" value="<%= survey.id %>" />
-              <input type="text" placeholder="Your answer" name="answer" />
+            <%= form_for @conn, answer_path(@conn, :create), [class: "hidden"], fn f -> %>
+              <%= hidden_input f, :survey_id, value: survey.id %>
+              <%= text_input f, :answer, placeholder: "Your answer", required: true %>
               <button type="button" class="inline-form-close">cancel</button>
-              <button type="submit">submit</button>
-            </form>
+              <%= submit "submit" %>
+            <% end %>
           </div>
         </div>
       </div>
