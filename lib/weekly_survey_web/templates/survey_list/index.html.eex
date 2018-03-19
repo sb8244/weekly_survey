@@ -6,18 +6,25 @@
       <h3><%= survey.question %></h3>
 
       <div class="row survey-answers__header">
-        <div class="col-4">Ideas</div>
-        <div class="col-4">Why</div>
-        <div class="col-4">&nbsp;</div>
+        <div class="col-5">Ideas</div>
+        <div class="col-7">Why</div>
       </div>
 
       <%= for answer <- survey.answers do %>
-        <%= render "_answer.html", answer: answer %>
+        <%= render "_answer.html", answer: answer, survey: survey %>
       <% end %>
 
       <div class="row survey-answers__answer-form-wrapper">
-        <div class="col-4">
-          <a href="#">+ Add Answer</a>
+        <div class="col-5">
+          <div class="inline-form">
+            <a href="#">+ Add Answer</a>
+            <form class="hidden" method="POST">
+              <input type="hidden" name="survey_id" value="<%= survey.id %>" />
+              <input type="text" placeholder="Your answer" name="answer" />
+              <button type="button" class="inline-form-close">cancel</button>
+              <button type="submit">submit</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

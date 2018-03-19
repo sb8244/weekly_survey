@@ -1,13 +1,21 @@
 <div class="row survey-answers__answer">
-  <div class="col-4"><%= @answer.answer %></div>
-  <div class="col-4">
+  <div class="col-5"><%= @answer.answer %></div>
+  <div class="col-7">
     <%= for discussion <- @answer.discussions do %>
       <div class="survey-answers__discussion"><%= discussion %></div>
     <% end %>
 
     <div class="survey-answers__discussion survey-answers__discussion-form-wrapper">
-      <a href="#">+ Add discussion</a>
+      <div class="inline-form">
+        <a href="#">+ Add discussion</a>
+        <form class="hidden" method="POST">
+          <input type="hidden" name="survey_id" value="<%= @survey.id %>" />
+          <input type="hidden" name="answer_id" value="<%= @answer.id %>" />
+          <input type="text" placeholder="Why?" name="discussion" />
+          <button type="button" class="inline-form-close">cancel</button>
+          <button type="submit">submit</button>
+        </form>
+      </div>
     </div>
   </div>
-  <div class="col-4"></div>
 </div>

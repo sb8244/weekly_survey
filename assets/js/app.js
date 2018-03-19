@@ -19,3 +19,24 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
+
+import $ from 'jquery';
+
+$(document.body).on('click', '.inline-form a', (e) => {
+  e.preventDefault();
+
+  const link = $(e.target);
+  const form = link.parent().find('form');
+  form.removeClass('hidden');
+  link.addClass('hidden');
+  form.find("input").focus();
+});
+
+$(document.body).on('click', '.inline-form-close', (e) => {
+  e.preventDefault();
+
+  const link = $(e.target).parents('.inline-form').find('a');
+  const form = $(e.target).parents('.inline-form').find('form');
+  form.addClass('hidden');
+  link.removeClass('hidden');
+});
