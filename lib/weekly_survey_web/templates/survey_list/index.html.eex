@@ -11,7 +11,7 @@
       </div>
 
       <%= for answer <- survey.answers do %>
-        <%= render "_answer.html", answer: answer, survey: survey %>
+        <%= render "_answer.html", answer: answer, survey: survey, conn: @conn %>
       <% end %>
 
       <div class="row survey-answers__answer-form-wrapper">

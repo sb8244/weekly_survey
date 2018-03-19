@@ -2,19 +2,18 @@
   <div class="col-5"><%= @answer.answer %></div>
   <div class="col-7">
     <%= for discussion <- @answer.discussions do %>
-      <div class="survey-answers__discussion"><%= discussion %></div>
+      <div class="survey-answers__discussion"><%= discussion.content %></div>
     <% end %>
 
     <div class="survey-answers__discussion survey-answers__discussion-form-wrapper">
       <div class="inline-form">
         <a href="#">+ Add discussion</a>
-        <form class="hidden" method="POST">
-          <input type="hidden" name="survey_id" value="<%= @survey.id %>" />
-          <input type="hidden" name="answer_id" value="<%= @answer.id %>" />
-          <input type="text" placeholder="Why?" name="discussion" />
+        <%= form_for @conn, discussion_path(@conn, :create), [class: "hidden"], fn f -> %>
+          <%= hidden_input f, :answer_id, value: @answer.id %>
+          <%= text_input f, :content, placeholder: "Why?", required: true %>
           <button type="button" class="inline-form-close">cancel</button>
-          <button type="submit">submit</button>
-        </form>
+          <%= submit "submit" %>
+        <% end %>
       </div>
     </div>
   </div>

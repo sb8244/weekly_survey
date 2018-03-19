@@ -18,6 +18,7 @@ defmodule WeeklySurveyWeb.Router do
 
     get "/", SurveyListController, :index
     resources "/answers", AnswerController, only: [:create]
+    resources "/discussions", DiscussionController, only: [:create]
   end
 
   # Other scopes may use custom stacks.

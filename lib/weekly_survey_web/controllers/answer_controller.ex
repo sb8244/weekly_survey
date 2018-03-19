@@ -3,14 +3,14 @@ defmodule WeeklySurveyWeb.AnswerController do
 
   alias WeeklySurvey.Surveys
 
-  def create(conn, params = %{"answer" => answer, "survey_id" => survey_id}) do
+  def create(conn, params = %{"survey_id" => survey_id}) do
     {:ok, _} = Surveys.add_answer_to_survey(String.to_integer(survey_id), creation_params(params))
 
     conn
       |> redirect(to: survey_list_path(conn, :index))
   end
 
-  defp creation_params(params = %{"answer" => answer}) do
+  defp creation_params(%{"answer" => answer}) do
     %{
       answer: answer
     }
