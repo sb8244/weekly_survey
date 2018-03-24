@@ -3,10 +3,12 @@ defmodule WeeklySurvey.Surveys.Discussion do
   import Ecto.Changeset
 
   alias WeeklySurvey.Surveys.Answer
+  alias WeeklySurvey.Users.User
 
   schema "discussions" do
     field :content, :string
     belongs_to :answer, Answer
+    belongs_to :user, User
 
     timestamps()
   end

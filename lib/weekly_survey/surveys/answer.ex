@@ -4,11 +4,13 @@ defmodule WeeklySurvey.Surveys.Answer do
 
   alias WeeklySurvey.Surveys.Survey
   alias WeeklySurvey.Surveys.Discussion
+  alias WeeklySurvey.Users.User
 
   schema "answers" do
     field :answer, :string
     belongs_to :survey, Survey
     has_many :discussions, Discussion
+    belongs_to :user, User
 
     timestamps()
   end
