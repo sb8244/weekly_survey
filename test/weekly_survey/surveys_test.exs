@@ -85,4 +85,40 @@ defmodule WeeklySurvey.SurveysTest do
       assert surveys |> Enum.at(0) |> Map.get(:answers) |> Enum.at(0) |> Map.get(:discussions) == [discussion1]
     end
   end
+
+  describe "cast_vote/2" do
+    test "a user can cast a vote for an answer" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+
+      assert vote.user_id == user.id
+      assert vote.id
+      assert vote.voteable_id == answer.id
+    end
+
+    test "a user can cast a vote for a discussion" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(discussion, user: user)
+
+      assert vote.user_id == user.id
+      assert vote.id
+      assert vote.voteable_id == discussion.id
+    end
+
+    test "a user cannot double vote for an item" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+      {:ok, vote2} = Surveys.cast_vote(answer, user: user)
+
+      assert vote.id
+      assert vote2.id == nil
+    end
+  end
 end

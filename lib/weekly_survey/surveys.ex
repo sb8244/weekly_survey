@@ -1,11 +1,9 @@
 defmodule WeeklySurvey.Surveys do
-  alias WeeklySurvey.Surveys.Survey
-  alias WeeklySurvey.Surveys.Answer
-  alias WeeklySurvey.Surveys.Discussion
-
+  alias WeeklySurvey.Surveys.{Answer, Discussion, Query.AvailableSurveys, Survey, Vote}
   alias WeeklySurvey.Repo
   alias WeeklySurvey.Users.User
-  import Ecto.Query
+
+  import Vote.Guards
 
   def create_survey(params = %{}) do
     Survey.changeset(%Survey{}, params)
@@ -31,20 +29,11 @@ defmodule WeeklySurvey.Surveys do
   end
 
   def get_available_surveys() do
-    discussion_preloading_query =
-      from d in Discussion,
-      order_by: [asc: :id]
+    AvailableSurveys.get_available_surveys()
+  end
 
-    answers_preloading_query =
-      from a in Answer,
-      order_by: [asc: :id],
-      preload: [discussions: ^discussion_preloading_query]
-
-    query =
-      from s in Survey,
-      order_by: [asc: :id],
-      preload: [answers: ^answers_preloading_query]
-
-    Repo.all(query)
+  def cast_vote(voteable = %{__struct__: struct}, user: user) when is_voteable(struct) do
+    Ecto.build_assoc(voteable, :votes, user_id: user.id)
+      |> Repo.insert(on_conflict: :nothing)
   end
 end
