@@ -18,15 +18,19 @@
     </div>
   </div>
   <div class="col-1">
-    <div class="inline-form">
-      <a href="#">+ Vote</a>
-      <%= form_for @conn, votes_path(@conn, :create), [class: "hidden"], fn f -> %>
-        <%= hidden_input f, :voteable_id, value: @answer.id %>
-        <%= hidden_input f, :voteable_type, value: "answer" %>
-        <%= submit "submit" %>
+    <%= if length(@answer.votes) == 1 do %>
+      <span class="voted-badge" data-answer-id="<%= @answer.id %>">Voted!</span>
+    <% else %>
+      <%= if !@survey.has_answer_vote do %>
+        <div class="inline-form">
+          <a href="#">Vote</a>
+          <%= form_for @conn, votes_path(@conn, :create), [class: "hidden"], fn f -> %>
+            <%= hidden_input f, :voteable_id, value: @answer.id %>
+            <%= hidden_input f, :voteable_type, value: "answer" %>
+            <%= submit "submit" %>
+          <% end %>
+        </div>
       <% end %>
-    </div>
-
-    <%= @answer.votes |> inspect %>
+    <% end %>
   </div>
 </div>

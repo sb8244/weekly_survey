@@ -33,4 +33,20 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
     assert html =~ discussion1.content
     assert html =~ discussion2.content
   end
+
+  test "the user answer vote is shown on the screen and the other answer vote options are removed", %{session_conn: conn} do
+    {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+    {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+    {:ok, _} = Surveys.cast_vote(answer, user: user)
+
+    html =
+      conn
+        |> put_session(:user_guid, user.guid)
+        |> get("/")
+        |> html_response(200)
+
+    assert html =~ ~s(<span class="voted-badge" data-answer-id="#{answer.id}">Voted!</span>)
+    refute html =~ ~s(>Vote</a>)
+  end
 end
