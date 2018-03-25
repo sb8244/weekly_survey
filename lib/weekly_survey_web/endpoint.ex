@@ -36,7 +36,8 @@ defmodule WeeklySurveyWeb.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_weekly_survey_key",
-    signing_salt: @signing_salt
+    signing_salt: @signing_salt,
+    max_age: 60 * 60 * 24 * 7 # 7 days
 
   plug WeeklySurveyWeb.Router
 
