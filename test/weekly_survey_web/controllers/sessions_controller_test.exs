@@ -2,7 +2,7 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
   use WeeklySurveyWeb.ConnCase
   use WeeklySurvey.DataCase, no_checkout: true, async: true
 
-  test "it's an empty json payload", %{conn: conn} do
+  test "it returns a json payload with a user guid token", %{conn: conn} do
     %{"ug" => token} =
       assert conn
         |> post("/asession")
@@ -10,6 +10,20 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
 
     {:ok, user} = WeeklySurvey.Users.get_user_from_encrypted_payload(token)
     assert user.id
+  end
+
+  test "user_info is returned", %{session_conn: conn} do
+    {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
+
+    json =
+      conn
+        |> put_session(:user_guid, user.guid)
+        |> post("/asession")
+        |> json_response(200)
+
+    assert json |> Map.get("user_info") |> Map.keys() == ["name", "updated_at"]
+    assert json |> Map.get("user_info") |> Map.get("name") == "Test"
   end
 
   test "a user GUID is assigned to cookie", %{conn: conn} do

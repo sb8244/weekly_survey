@@ -1,13 +1,15 @@
 defmodule WeeklySurveyWeb.SessionsController do
   use WeeklySurveyWeb, :controller
 
+  alias WeeklySurvey.Users
+
   def create_anonymous(conn, params) do
     {:ok, user} = get_user(conn, params)
-    {:ok, encrypted_user_info} = WeeklySurvey.Users.get_encrypted_user_payload(user: user)
+    {:ok, encrypted_user_info} = Users.get_encrypted_user_payload(user: user)
 
     conn
       |> put_session(:user_guid, user.guid)
-      |> json(%{ug: encrypted_user_info})
+      |> json(%{ug: encrypted_user_info, user_info: get_user_info(user)})
   end
 
   defp get_user(conn, params) do
@@ -16,9 +18,9 @@ defmodule WeeklySurveyWeb.SessionsController do
         nil ->
           case Map.get(params, "ug") do
             nil -> create_new_user()
-            jwt -> WeeklySurvey.Users.get_user_from_encrypted_payload(jwt)
+            jwt -> Users.get_user_from_encrypted_payload(jwt)
           end
-        guid -> WeeklySurvey.Users.find_or_create_user(guid)
+        guid -> Users.find_or_create_user(guid)
       end
 
     case user do
@@ -29,6 +31,11 @@ defmodule WeeklySurveyWeb.SessionsController do
   end
 
   defp create_new_user() do
-    WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    Users.find_or_create_user(UUID.uuid4())
+  end
+
+  defp get_user_info(user) do
+    {:ok, info} = Users.get_user_info(user)
+    Map.take(info, [:name, :updated_at])
   end
 end
