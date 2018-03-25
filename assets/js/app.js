@@ -21,6 +21,9 @@ import "phoenix_html"
 // import socket from "./socket"
 
 import $ from 'jquery';
+import ensureAnonymousSession from './services/session';
+
+ensureAnonymousSession();
 
 $(document.body).on('click', '.inline-form a', (e) => {
   e.preventDefault();
