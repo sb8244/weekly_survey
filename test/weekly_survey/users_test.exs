@@ -20,7 +20,7 @@ defmodule WeeklySurvey.UsersTest do
     end
 
     test "an invalid GUID is a failure" do
-      {:error, "An error occurred with the User GUID provided"} = Users.find_or_create_user("X")
+      {:error, :user_not_found} = Users.find_or_create_user("X")
     end
   end
 end
