@@ -17,6 +17,7 @@ defmodule WeeklySurveyWeb.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", SurveyListController, :index
+    post "/asession", SessionsController, :create_anonymous
     resources "/answers", AnswerController, only: [:create]
     resources "/discussions", DiscussionController, only: [:create]
   end

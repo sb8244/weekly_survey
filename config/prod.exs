@@ -31,3 +31,6 @@ config :weekly_survey, WeeklySurvey.Repo,
   password: "postgres",
   database: "weekly_survey_prod",
   pool_size: 15
+
+config :weekly_survey, WeeklySurvey.Users.EncryptedGuid,
+  secret: {:system, "USERS_ENCRYPTION_SECRET"}
