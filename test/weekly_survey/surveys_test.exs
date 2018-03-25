@@ -86,6 +86,23 @@ defmodule WeeklySurvey.SurveysTest do
     end
   end
 
+  describe "get_voteable/3" do
+    test "an answer is found" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, ^answer} = Surveys.get_voteable("answer", answer.id)
+    end
+
+    test "a discussion is found" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, ^discussion} = Surveys.get_voteable("discussion", discussion.id)
+    end
+  end
+
   describe "cast_vote/2" do
     test "a user can cast a vote for an answer" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())

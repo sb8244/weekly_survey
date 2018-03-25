@@ -36,4 +36,11 @@ defmodule WeeklySurvey.Surveys do
     Ecto.build_assoc(voteable, :votes, user_id: user.id)
       |> Repo.insert(on_conflict: :nothing)
   end
+
+  def get_voteable(voteable_type, voteable_id) when is_voteable_string(voteable_type) do
+    case Repo.get(Vote.get_voteable_module(voteable_type), voteable_id) do
+      nil -> {:error, :not_found}
+      voteable -> {:ok, voteable}
+    end
+  end
 end

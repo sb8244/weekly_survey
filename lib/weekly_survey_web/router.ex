@@ -21,6 +21,7 @@ defmodule WeeklySurveyWeb.Router do
     resources "/answers", AnswerController, only: [:create]
     resources "/discussions", DiscussionController, only: [:create]
     resources "/user_info", UsersInfoController, only: [:update], singleton: true
+    resources "/votes", VotesController, only: [:create]
   end
 
   # Other scopes may use custom stacks.
