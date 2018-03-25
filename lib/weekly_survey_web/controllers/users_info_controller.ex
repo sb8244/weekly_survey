@@ -23,12 +23,4 @@ defmodule WeeklySurveyWeb.UsersInfoController do
       name: name
     }
   end
-
-  defp get_message_from_errors(errors) do
-    errors
-    |> Enum.map(fn {key, {message, _}} ->
-        Enum.join([to_string(key), to_string(message)], " ")
-      end)
-    |> Enum.join(", ")
-  end
 end

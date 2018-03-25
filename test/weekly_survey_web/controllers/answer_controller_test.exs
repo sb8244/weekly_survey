@@ -27,5 +27,27 @@ defmodule WeeklySurveyWeb.AnswerControllerTest do
       assert answer.survey_id == survey.id
       assert answer.answer == "testing"
     end
+
+    test "invalid params render a flash error", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+
+      response = conn
+        |> put_session(:user_guid, user.guid)
+        |> post(answer_path(conn, :create), answer: " ", survey_id: "0")
+
+      assert redirected_to(response, 302) == "/"
+      assert get_flash(response, :error) == "Your answer was not added: answer can't be blank"
+    end
+
+    test "invalid relationship render a flash error", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+
+      response = conn
+        |> put_session(:user_guid, user.guid)
+        |> post(answer_path(conn, :create), answer: "x", survey_id: "0")
+
+      assert redirected_to(response, 302) == "/"
+      assert get_flash(response, :error) =~ "survey_id does not exist"
+    end
   end
 end

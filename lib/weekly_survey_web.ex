@@ -23,6 +23,7 @@ defmodule WeeklySurveyWeb do
       import Plug.Conn
       import WeeklySurveyWeb.Router.Helpers
       import WeeklySurveyWeb.Gettext
+      import WeeklySurveyWeb.EctoOperationHelper
     end
   end
 

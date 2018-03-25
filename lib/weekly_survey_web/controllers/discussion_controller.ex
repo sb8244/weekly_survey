@@ -5,10 +5,8 @@ defmodule WeeklySurveyWeb.DiscussionController do
 
   alias WeeklySurvey.Surveys
 
-  def create(conn = %{assigns: %{user: user}}, params = %{"answer_id" => answer_id}) do
-    {:ok, _} = Surveys.add_discussion_to_answer(String.to_integer(answer_id), creation_params(params), user: user)
-
-    conn
+  def create(conn, params) do
+    handle_ecto_operation(&add_discussion_to_answer/1, [conn: conn, params: params], error_reason: "Your discussion was not added")
       |> redirect(to: survey_list_path(conn, :index))
   end
 
@@ -16,5 +14,9 @@ defmodule WeeklySurveyWeb.DiscussionController do
     %{
       content: content
     }
+  end
+
+  defp add_discussion_to_answer(conn: %{assigns: %{user: user}}, params: params = %{"answer_id" => answer_id}) do
+    Surveys.add_discussion_to_answer(String.to_integer(answer_id), creation_params(params), user: user)
   end
 end

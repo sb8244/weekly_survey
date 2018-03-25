@@ -28,5 +28,16 @@ defmodule WeeklySurveyWeb.DiscussionControllerTest do
       assert discussion.answer_id == answer.id
       assert discussion.content == "testing"
     end
+
+    test "invalid params return an error", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+
+      response = conn
+        |> put_session(:user_guid, user.guid)
+        |> post(discussion_path(conn, :create), content: " ", answer_id: "0")
+
+      assert redirected_to(response, 302) == "/"
+      assert get_flash(response, :error) == "Your discussion was not added: content can't be blank"
+    end
   end
 end
