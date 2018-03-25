@@ -34,7 +34,7 @@ defmodule WeeklySurvey.Users do
 
   def set_user_info(%User{id: id}, params) do
     UserInfo.changeset(%UserInfo{}, Map.merge(params, %{user_id: id}))
-      |> Repo.insert(on_conflict: [set: [name: "updated"]], conflict_target: :user_id)
+      |> Repo.insert(on_conflict: :replace_all, conflict_target: :user_id)
   end
 
   def get_user_info(%User{id: id}) do

@@ -36,8 +36,9 @@ defmodule WeeklySurvey.UsersTest do
     test "existing user_info is updated, if it exists" do
       {:ok, user} = Users.find_or_create_user(UUID.uuid4())
       {:ok, info = %UserInfo{}} = Users.set_user_info(user, %{name: "Steve"})
-      {:ok, info2 = %UserInfo{}} = Users.set_user_info(user, %{name: "Updated"})
-      assert info2.name == "Updated"
+      {:ok, info2 = %UserInfo{}} = Users.set_user_info(user, %{name: "New"})
+      {:ok, fetch_info = %UserInfo{}} = Users.get_user_info(user)
+      assert fetch_info.name == "New"
       assert info.id == info2.id
     end
   end
