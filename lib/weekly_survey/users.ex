@@ -25,7 +25,9 @@ defmodule WeeklySurvey.Users do
   end
 
   def get_user_from_encrypted_payload(token) when is_bitstring(token) do
-    {:ok, %{"guid" => guid}} = EncryptedGuid.get_user_information(token)
-    find_or_create_user(guid)
+    case EncryptedGuid.get_user_information(token) do
+      {:ok, %{"guid" => guid}} -> find_or_create_user(guid)
+      _ -> {:error, :invalid_jwt}
+    end
   end
 end

@@ -22,6 +22,17 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
     assert user.id
   end
 
+  test "User info in a JWT is assigned to cookie", %{conn: conn} do
+    {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, payload} = WeeklySurvey.Users.get_encrypted_user_payload(user: user)
+
+    guid = assert conn
+      |> post("/asession", %{"ug" => payload})
+      |> get_session(:user_guid)
+
+    assert guid == user.guid
+  end
+
   test "an existing user is used", %{session_conn: conn} do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
 
@@ -36,5 +47,13 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
       |> put_session(:user_guid, "fake")
       |> post("/asession")
       |> get_session(:user_guid) =~ WeeklySurvey.TestHelpers.guid_regexp()
+  end
+
+  test "invalid user info creates a new user", %{conn: conn} do
+    guid = assert conn
+      |> post("/asession", %{"ug" => "nope"})
+      |> get_session(:user_guid)
+
+    assert guid =~ WeeklySurvey.TestHelpers.guid_regexp()
   end
 end
