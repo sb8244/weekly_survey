@@ -1,11 +1,18 @@
 export default function ensureAnonymousSession() {
-  postData('/asession', {ug: localStorage.ug})
+  return postData('/asession', {ug: localStorage.ug})
     .then(data => {
+      const ret = {};
+
       if (data.ug) {
         localStorage.ug = data.ug;
       }
-    })
-    .catch(error => console.error(error))
+
+      if (!data.user_info.name) {
+        ret.userInfoForm = true;
+      }
+
+      return ret;
+    });
 }
 
 function postData(url, data) {

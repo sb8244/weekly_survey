@@ -23,7 +23,9 @@ import "phoenix_html"
 import $ from 'jquery';
 import ensureAnonymousSession from './services/session';
 
-ensureAnonymousSession();
+ensureAnonymousSession().then((results) => {
+  console.log(results);
+});
 
 $(document.body).on('click', '.inline-form a', (e) => {
   e.preventDefault();
