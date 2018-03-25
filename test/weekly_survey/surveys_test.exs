@@ -66,7 +66,7 @@ defmodule WeeklySurvey.SurveysTest do
     end
   end
 
-  describe "get_available_surveys/0" do
+  describe "get_available_surveys/1" do
     test "all surveys are returned with answers and discussion (temporary, need to scope to active only)" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
@@ -75,14 +75,68 @@ defmodule WeeklySurvey.SurveysTest do
       {:ok, discussion1} = Surveys.add_discussion_to_answer(answer1.id, %{content: "Discuss"}, user: user)
       {:ok, answer2} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
 
-      surveys = Surveys.get_available_surveys()
+      surveys = Surveys.get_available_surveys(user: user)
       assert length(surveys) == 2
 
       assert Enum.at(surveys, 0).id == survey.id
       assert Enum.at(surveys, 1).id == survey2.id
       assert Enum.at(surveys, 0).answers |> Enum.map(& &1.id) == [answer1.id, answer2.id]
       assert Enum.at(surveys, 1).answers == []
+
+      discussion1 = Repo.preload(discussion1, :votes)
       assert surveys |> Enum.at(0) |> Map.get(:answers) |> Enum.at(0) |> Map.get(:discussions) == [discussion1]
+    end
+
+    test "votes by the current user for answers only are returned" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, _} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, _} = Surveys.cast_vote(answer, user: user)
+      {:ok, _} = Surveys.cast_vote(answer, user: user2)
+
+      surveys = Surveys.get_available_surveys(user: user)
+      answers = surveys |> Enum.at(0) |> Map.get(:answers)
+      assert length(answers) == 1
+
+      votes = answers |> Enum.at(0) |> Map.get(:votes)
+      assert length(votes) == 1
+      assert votes |> Enum.at(0) |> Map.get(:user_id) == user.id
+    end
+
+    test "votes by all users for discussions are returned" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, _} = Surveys.cast_vote(discussion, user: user)
+      {:ok, _} = Surveys.cast_vote(discussion, user: user2)
+
+      surveys = Surveys.get_available_surveys(user: user)
+      answers = surveys |> Enum.at(0) |> Map.get(:answers)
+      assert length(answers) == 1
+
+      votes = answers |> Enum.at(0) |> Map.get(:discussions) |> Enum.at(0) |> Map.get(:votes)
+      assert length(votes) == 2
+    end
+
+    test "no votes are returned for answers, without a user" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, _} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, _} = Surveys.cast_vote(answer, user: user)
+      {:ok, _} = Surveys.cast_vote(answer, user: user2)
+
+      surveys = Surveys.get_available_surveys(user: nil)
+      answers = surveys |> Enum.at(0) |> Map.get(:answers)
+      assert length(answers) == 1
+
+      votes = answers |> Enum.at(0) |> Map.get(:votes)
+      assert length(votes) == 0
     end
   end
 

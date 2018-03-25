@@ -7,7 +7,10 @@ config :weekly_survey, WeeklySurveyWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+
+if System.get_env("LOG_SQL") == nil do
+  config :logger, level: :warn
+end
 
 # Configure your database
 config :weekly_survey, WeeklySurvey.Repo,

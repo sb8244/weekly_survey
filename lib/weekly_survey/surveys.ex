@@ -28,8 +28,8 @@ defmodule WeeklySurvey.Surveys do
       |> Repo.insert()
   end
 
-  def get_available_surveys() do
-    AvailableSurveys.get_available_surveys()
+  def get_available_surveys(user: user) do
+    AvailableSurveys.get_available_surveys(user: user)
   end
 
   def cast_vote(voteable = %{__struct__: struct}, user: user) when is_voteable(struct) do

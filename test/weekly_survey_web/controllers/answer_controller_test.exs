@@ -22,7 +22,7 @@ defmodule WeeklySurveyWeb.AnswerControllerTest do
         |> post(answer_path(conn, :create), answer: "testing", survey_id: to_string(survey.id))
         |> redirected_to(302) == "/"
 
-      [%{answers: [answer]}] = Surveys.get_available_surveys()
+      [%{answers: [answer]}] = Surveys.get_available_surveys(user: nil)
       assert answer.id
       assert answer.survey_id == survey.id
       assert answer.answer == "testing"

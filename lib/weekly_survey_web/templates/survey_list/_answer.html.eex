@@ -1,6 +1,6 @@
 <div class="row survey-answers__answer">
   <div class="col-5"><%= @answer.answer %></div>
-  <div class="col-7">
+  <div class="col-6">
     <%= for discussion <- @answer.discussions do %>
       <div class="survey-answers__discussion"><%= discussion.content %></div>
     <% end %>
@@ -16,5 +16,17 @@
         <% end %>
       </div>
     </div>
+  </div>
+  <div class="col-1">
+    <div class="inline-form">
+      <a href="#">+ Vote</a>
+      <%= form_for @conn, votes_path(@conn, :create), [class: "hidden"], fn f -> %>
+        <%= hidden_input f, :voteable_id, value: @answer.id %>
+        <%= hidden_input f, :voteable_type, value: "answer" %>
+        <%= submit "submit" %>
+      <% end %>
+    </div>
+
+    <%= @answer.votes |> inspect %>
   </div>
 </div>

@@ -23,7 +23,7 @@ defmodule WeeklySurveyWeb.DiscussionControllerTest do
         |> post(discussion_path(conn, :create), content: "testing", answer_id: to_string(answer.id))
         |> redirected_to(302) == "/"
 
-      [%{answers: [%{discussions: [discussion]}]}] = Surveys.get_available_surveys()
+      [%{answers: [%{discussions: [discussion]}]}] = Surveys.get_available_surveys(user: nil)
       assert discussion.id
       assert discussion.answer_id == answer.id
       assert discussion.content == "testing"

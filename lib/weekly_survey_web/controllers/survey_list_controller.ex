@@ -1,9 +1,13 @@
 defmodule WeeklySurveyWeb.SurveyListController do
   use WeeklySurveyWeb, :controller
 
-  def index(conn, _params) do
+  plug WeeklySurvey.Users.AuthenticationPlug, [required: false]
+
+  def index(conn = %{assigns: assigns}, _params) do
+    user = Map.get(assigns, :user)
+
     conn
-      |> assign(:surveys, WeeklySurvey.Surveys.get_available_surveys())
+      |> assign(:surveys, WeeklySurvey.Surveys.get_available_surveys(user: user))
       |> render("index.html")
   end
 end
