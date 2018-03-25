@@ -7,10 +7,18 @@ defmodule WeeklySurveyWeb.AnswerControllerTest do
   @valid_survey_params %{name: "Test", question: "A question?"}
 
   describe "POST /answers" do
-    test "valid params create an answer", %{conn: conn} do
+    test "user auth is required", %{conn: conn} do
+      assert conn
+        |> post(answer_path(conn, :create), answer: "testing", survey_id: 0)
+        |> text_response(403) == "You must be authenticated to perform this action. Refresh and try again."
+    end
+
+    test "valid params create an answer", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
 
       assert conn
+        |> put_session(:user_guid, user.guid)
         |> post(answer_path(conn, :create), answer: "testing", survey_id: to_string(survey.id))
         |> redirected_to(302) == "/"
 

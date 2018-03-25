@@ -28,7 +28,21 @@ defmodule WeeklySurveyWeb.ConnCase do
 
 
   setup tags do
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    conn = Phoenix.ConnTest.build_conn()
+    {:ok, conn: conn, session_conn: session_conn(conn)}
   end
 
+  def session_conn(conn) do
+    opts =
+      Plug.Session.init(
+        store: :cookie,
+        key: "_weekly_survey_key",
+        signing_salt: WeeklySurveyWeb.Endpoint.signing_salt(),
+        log: false,
+        encrypt: false
+      )
+    conn
+    |> Plug.Session.call(opts)
+    |> Plug.Conn.fetch_session()
+  end
 end

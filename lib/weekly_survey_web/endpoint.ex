@@ -1,4 +1,6 @@
 defmodule WeeklySurveyWeb.Endpoint do
+  @signing_salt "f6hkmFCc"
+
   use Phoenix.Endpoint, otp_app: :weekly_survey
 
   # Serve at "/" the static files from "priv/static" directory.
@@ -34,7 +36,7 @@ defmodule WeeklySurveyWeb.Endpoint do
   plug Plug.Session,
     store: :cookie,
     key: "_weekly_survey_key",
-    signing_salt: "f6hkmFCc"
+    signing_salt: @signing_salt
 
   plug WeeklySurveyWeb.Router
 
@@ -52,4 +54,6 @@ defmodule WeeklySurveyWeb.Endpoint do
       {:ok, config}
     end
   end
+
+  def signing_salt(), do: @signing_salt
 end
