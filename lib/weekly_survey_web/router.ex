@@ -20,6 +20,7 @@ defmodule WeeklySurveyWeb.Router do
     post "/asession", SessionsController, :create_anonymous
     resources "/answers", AnswerController, only: [:create]
     resources "/discussions", DiscussionController, only: [:create]
+    resources "/user_info", UsersInfoController, only: [:update], singleton: true
   end
 
   # Other scopes may use custom stacks.

@@ -2,9 +2,11 @@ defmodule WeeklySurvey.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias WeeklySurvey.Users.UserInfo
 
   schema "users" do
     field :guid, Ecto.UUID
+    has_one :user_info, UserInfo
 
     timestamps()
   end

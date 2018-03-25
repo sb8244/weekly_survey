@@ -1,6 +1,7 @@
 defmodule WeeklySurvey.Users do
   alias WeeklySurvey.Repo
   alias WeeklySurvey.Users.User
+  alias WeeklySurvey.Users.UserInfo
   alias WeeklySurvey.Users.EncryptedGuid
 
   def find_or_create_user(guid) do
@@ -28,6 +29,18 @@ defmodule WeeklySurvey.Users do
     case EncryptedGuid.get_user_information(token) do
       {:ok, %{"guid" => guid}} -> find_or_create_user(guid)
       _ -> {:error, :invalid_jwt}
+    end
+  end
+
+  def set_user_info(%User{id: id}, params) do
+    UserInfo.changeset(%UserInfo{}, Map.merge(params, %{user_id: id}))
+      |> Repo.insert(on_conflict: [set: [name: "updated"]], conflict_target: :user_id)
+  end
+
+  def get_user_info(%User{id: id}) do
+    case Repo.get_by(UserInfo, user_id: id) do
+      nil -> {:ok, %{}}
+      info = %UserInfo{} -> {:ok, info}
     end
   end
 end
