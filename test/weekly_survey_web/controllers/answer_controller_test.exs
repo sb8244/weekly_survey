@@ -10,7 +10,7 @@ defmodule WeeklySurveyWeb.AnswerControllerTest do
     test "user auth is required", %{conn: conn} do
       assert conn
         |> post(answer_path(conn, :create), answer: "testing", survey_id: 0)
-        |> text_response(403) == "You must be authenticated to perform this action. Refresh and try again."
+        |> text_response(403) =~ "You must be authenticated"
     end
 
     test "valid params create an answer", %{session_conn: conn} do

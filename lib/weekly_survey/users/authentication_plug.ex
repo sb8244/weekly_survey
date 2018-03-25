@@ -11,7 +11,7 @@ defmodule WeeklySurvey.Users.AuthenticationPlug do
       _ ->
       conn
         |> put_resp_header("content-type", "text/plain")
-        |> send_resp(403, "You must be authenticated to perform this action. Refresh and try again.")
+        |> send_resp(403, "You must be authenticated to perform this action. Load the app in a different window to get a session, then refresh and try again.")
         |> halt()
     end
   end
