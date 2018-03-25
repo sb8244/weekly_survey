@@ -4,7 +4,7 @@ defmodule WeeklySurvey.Users.User do
 
 
   schema "users" do
-    field :guid, :string
+    field :guid, Ecto.UUID
 
     timestamps()
   end
