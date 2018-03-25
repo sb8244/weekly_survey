@@ -101,6 +101,14 @@ defmodule WeeklySurvey.SurveysTest do
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
       {:ok, ^discussion} = Surveys.get_voteable("discussion", discussion.id)
     end
+
+    test "an invalid type is an error" do
+      {:error, :invalid_type} = Surveys.get_voteable("nope", 0)
+    end
+
+    test "an invalid id is an error" do
+      {:error, :not_found} = Surveys.get_voteable("discussion", 0)
+    end
   end
 
   describe "cast_vote/2" do

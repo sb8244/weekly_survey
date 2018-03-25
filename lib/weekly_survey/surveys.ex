@@ -43,4 +43,8 @@ defmodule WeeklySurvey.Surveys do
       voteable -> {:ok, voteable}
     end
   end
+
+  def get_voteable(_type, _id) do
+    {:error, :invalid_type}
+  end
 end

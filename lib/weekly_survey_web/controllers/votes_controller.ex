@@ -11,7 +11,10 @@ defmodule WeeklySurveyWeb.VotesController do
   end
 
   def cast_vote(conn: %{assigns: %{user: user}}, params: %{"voteable_id" => voteable_id, "voteable_type" => voteable_type}) do
-    {:ok, voteable} = Surveys.get_voteable(voteable_type, voteable_id)
-    Surveys.cast_vote(voteable, user: user)
+    case Surveys.get_voteable(voteable_type, voteable_id) do
+      {:ok, voteable} -> Surveys.cast_vote(voteable, user: user)
+      {:error, :not_found} -> {:error, fake_ecto_error(voteable_type, "was not found")}
+      {:error, :invalid_type} -> {:error, fake_ecto_error(voteable_type, "is invalid")}
+    end
   end
 end

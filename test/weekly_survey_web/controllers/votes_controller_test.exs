@@ -7,6 +7,36 @@ defmodule WeeklySurveyWeb.VotesControllerTest do
   @valid_survey_params %{name: "Test", question: "A question?"}
 
   describe "POST /votes" do
+    test "an invalid vote type is an error", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+
+      response =
+        conn
+          |> put_session(:user_guid, user.guid)
+          |> post(votes_path(conn, :create), voteable_type: "bleh", voteable_id: to_string(answer.id))
+
+      assert get_flash(response, :error) == "Your vote was not added: bleh is invalid"
+      answer = Repo.preload(answer, :votes)
+      assert answer.votes |> length() == 0
+    end
+
+    test "an invalid vote id is an error", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+
+      response =
+        conn
+          |> put_session(:user_guid, user.guid)
+          |> post(votes_path(conn, :create), voteable_type: "answer", voteable_id: "0")
+
+      assert get_flash(response, :error) == "Your vote was not added: answer was not found"
+      answer = Repo.preload(answer, :votes)
+      assert answer.votes |> length() == 0
+    end
+
     test "a vote is added for an answer", %{session_conn: conn} do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)

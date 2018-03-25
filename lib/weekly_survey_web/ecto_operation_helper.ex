@@ -9,10 +9,14 @@ defmodule WeeklySurveyWeb.EctoOperationHelper do
 
     case operation.(args) do
       {:ok, _} -> conn
-      {:error, changeset = %Ecto.Changeset{}} ->
-        message = error_reason <> ": " <> get_message_from_errors(changeset.errors)
+      {:error, %{errors: errors}} ->
+        message = error_reason <> ": " <> get_message_from_errors(errors)
         Phoenix.Controller.put_flash(conn, :error, message)
     end
+  end
+
+  def fake_ecto_error(field, message) do
+    %{errors: [{field, {message, []}}]}
   end
 
   def get_message_from_errors(errors) do
