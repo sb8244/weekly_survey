@@ -21,41 +21,46 @@ defmodule WeeklySurvey.SurveysTest do
 
   describe "add_answer_to_survey/2" do
     test "a valid answer is added to a survey" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"})
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
       assert answer.id
       assert answer.survey_id == survey.id
       assert answer.answer == "Answer"
     end
 
     test "a survey_id can be used" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"})
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
       assert answer.id
       assert answer.survey_id == survey.id
     end
 
     test "an invalid survey_id is an error" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:error, changeset} = Surveys.add_answer_to_survey(survey.id + 1, %{answer: "Answer"})
+      {:error, changeset} = Surveys.add_answer_to_survey(survey.id + 1, %{answer: "Answer"}, user: user)
       assert changeset.errors |> Keyword.keys == [:survey_id]
     end
   end
 
   describe "add_discussion_to_answer/2" do
     test "a valid discussion is added to an answer" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"})
-      {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"})
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
       assert discussion.id
       assert discussion.answer_id == answer.id
       assert discussion.content == "Discuss"
     end
 
     test "a valid discussion is added to an answer by id" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"})
-      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"})
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
       assert discussion.id
       assert discussion.answer_id == answer.id
     end
@@ -63,11 +68,12 @@ defmodule WeeklySurvey.SurveysTest do
 
   describe "get_available_surveys/0" do
     test "all surveys are returned with answers and discussion (temporary, need to scope to active only)" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, survey2} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer1} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"})
-      {:ok, discussion1} = Surveys.add_discussion_to_answer(answer1.id, %{content: "Discuss"})
-      {:ok, answer2} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"})
+      {:ok, answer1} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, discussion1} = Surveys.add_discussion_to_answer(answer1.id, %{content: "Discuss"}, user: user)
+      {:ok, answer2} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
 
       surveys = Surveys.get_available_surveys()
       assert length(surveys) == 2

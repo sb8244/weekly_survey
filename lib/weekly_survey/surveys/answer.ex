@@ -18,8 +18,9 @@ defmodule WeeklySurvey.Surveys.Answer do
   @doc false
   def changeset(answer, attrs) do
     answer
-    |> cast(attrs, [:answer, :survey_id])
-    |> validate_required([:answer, :survey_id])
+    |> cast(attrs, [:answer, :survey_id, :user_id])
+    |> validate_required([:answer, :survey_id, :user_id])
     |> foreign_key_constraint(:survey_id)
+    |> foreign_key_constraint(:user_id)
   end
 end

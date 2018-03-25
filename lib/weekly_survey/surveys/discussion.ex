@@ -16,8 +16,9 @@ defmodule WeeklySurvey.Surveys.Discussion do
   @doc false
   def changeset(discussion, attrs) do
     discussion
-    |> cast(attrs, [:content, :answer_id])
-    |> validate_required([:content, :answer_id])
+    |> cast(attrs, [:content, :answer_id, :user_id])
+    |> validate_required([:content, :answer_id, :user_id])
     |> foreign_key_constraint(:answer_id)
+    |> foreign_key_constraint(:user_id)
   end
 end
