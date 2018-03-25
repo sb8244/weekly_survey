@@ -4,6 +4,25 @@
   display: none;
 }
 
+.alert {
+  padding: 15px;
+
+  &-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+}
+
+.title-wrapper {
+  display: flex;
+  align-items: center;
+
+  h2 {
+    flex-grow: 1;
+  }
+}
+
 .survey-wrapper {
   margin-bottom: 80px;
 }
@@ -16,5 +35,11 @@
 
   &__discussion {
     margin-bottom: 15px;
+  }
+}
+
+.user-info-box {
+  &--top-right {
+    float: right;
   }
 }

@@ -24,7 +24,12 @@ import $ from 'jquery';
 import ensureAnonymousSession from './services/session';
 
 ensureAnonymousSession().then((results) => {
-  console.log(results);
+  if (results.userInfo) {
+    $(".user-info-box__name-link").text(results.userInfo.name);
+    $(".user-info-box input[name='name']").val(results.userInfo.name);
+  } else if (results.userInfoForm) {
+    $(".user-info-box__name-link").text("Enter your name");    
+  }
 });
 
 $(document.body).on('click', '.inline-form a', (e) => {

@@ -9,6 +9,8 @@ export default function ensureAnonymousSession() {
 
       if (!data.user_info.name) {
         ret.userInfoForm = true;
+      } else {
+        ret.userInfo = data.user_info;
       }
 
       return ret;
