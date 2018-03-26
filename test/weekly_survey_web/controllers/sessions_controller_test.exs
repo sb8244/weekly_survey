@@ -3,7 +3,7 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
   use WeeklySurvey.DataCase, no_checkout: true, async: true
 
   test "it returns a json payload with a user guid token", %{conn: conn} do
-    %{"ug" => token} =
+    %{"ug" => token, "retrieval_method" => "new"} =
       assert conn
         |> post("/asession")
         |> json_response(200)
@@ -22,6 +22,7 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
         |> post("/asession")
         |> json_response(200)
 
+    %{"retrieval_method" => "cookie"} = json
     assert json |> Map.get("user_info") |> Map.keys() == ["name", "updated_at"]
     assert json |> Map.get("user_info") |> Map.get("name") == "Test"
   end
@@ -40,10 +41,12 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
     {:ok, payload} = WeeklySurvey.Users.get_encrypted_user_payload(user: user)
 
-    guid = assert conn
-      |> post("/asession", %{"ug" => payload})
-      |> get_session(:user_guid)
+    response =
+      conn
+        |> post("/asession", %{"ug" => payload})
 
+    guid = response |> get_session(:user_guid)
+    %{"retrieval_method" => "jwt"} = json_response(response, 200)
     assert guid == user.guid
   end
 
@@ -57,17 +60,22 @@ defmodule WeeklySurveyWeb.SessionsControllerTest do
   end
 
   test "an invalid user is created fresh", %{session_conn: conn} do
-    assert conn
-      |> put_session(:user_guid, "fake")
-      |> post("/asession")
-      |> get_session(:user_guid) =~ WeeklySurvey.TestHelpers.guid_regexp()
+    response =
+      conn
+        |> put_session(:user_guid, "fake")
+        |> post("/asession")
+
+    %{"retrieval_method" => "new"} = json_response(response, 200)
+    assert get_session(response, :user_guid) =~ WeeklySurvey.TestHelpers.guid_regexp()
   end
 
   test "invalid user info creates a new user", %{conn: conn} do
-    guid = assert conn
-      |> post("/asession", %{"ug" => "nope"})
-      |> get_session(:user_guid)
+    response =
+      conn
+        |> post("/asession", %{"ug" => "nope"})
 
+    %{"retrieval_method" => "new"} = json_response(response, 200)
+    guid = get_session(response, :user_guid)
     assert guid =~ WeeklySurvey.TestHelpers.guid_regexp()
   end
 end

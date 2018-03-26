@@ -1,7 +1,7 @@
 export default function ensureAnonymousSession() {
   return postData('/asession', {ug: localStorage.ug})
     .then(data => {
-      const ret = {};
+      const ret = { retrievalMethod: data.retrieval_method };
 
       if (data.ug) {
         localStorage.ug = data.ug;

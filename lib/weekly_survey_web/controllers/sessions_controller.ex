@@ -4,12 +4,12 @@ defmodule WeeklySurveyWeb.SessionsController do
   alias WeeklySurvey.Users
 
   def create_anonymous(conn, params) do
-    {:ok, user} = get_user(conn, params)
+    {{:ok, user}, retrieval_method} = get_user(conn, params)
     {:ok, encrypted_user_info} = Users.get_encrypted_user_payload(user: user)
 
     conn
       |> put_session(:user_guid, user.guid)
-      |> json(%{ug: encrypted_user_info, user_info: get_user_info(user)})
+      |> json(%{ug: encrypted_user_info, user_info: get_user_info(user), retrieval_method: retrieval_method})
   end
 
   defp get_user(conn, params) do
@@ -17,15 +17,15 @@ defmodule WeeklySurveyWeb.SessionsController do
       case get_session(conn, :user_guid) do
         nil ->
           case Map.get(params, "ug") do
-            nil -> create_new_user()
-            jwt -> Users.get_user_from_encrypted_payload(jwt)
+            nil -> {create_new_user(), :new}
+            jwt -> {Users.get_user_from_encrypted_payload(jwt), :jwt}
           end
-        guid -> Users.find_or_create_user(guid)
+        guid -> {Users.find_or_create_user(guid), :cookie}
       end
 
     case user do
-      {:error, :invalid_jwt} -> create_new_user()
-      {:error, :user_not_found} -> create_new_user()
+      {{:error, :invalid_jwt}, _} -> {create_new_user(), :new}
+      {{:error, :user_not_found}, _} -> {create_new_user(), :new}
       success -> success
     end
   end
