@@ -51,6 +51,24 @@ defmodule WeeklySurveyWeb.VotesControllerTest do
       assert answer.votes |> length() == 1
     end
 
+    test "an answer vote can't be cast if another answer vote is on the survey", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+      {:ok, answer2} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+
+      response =
+        conn
+          |> put_session(:user_guid, user.guid)
+          |> post(votes_path(conn, :create), voteable_type: "answer", voteable_id: to_string(answer.id))
+          |> post(votes_path(conn, :create), voteable_type: "answer", voteable_id: to_string(answer2.id))
+
+      assert get_flash(response, :error) == "Your vote was not added: answer has already been voted on"
+      assert Repo.aggregate({"answers_votes", Surveys.Vote}, :count, :id) == 1
+      answer = Repo.preload(answer, :votes)
+      assert answer.votes |> length() == 1
+    end
+
     test "a vote is added for a discussion", %{session_conn: conn} do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)

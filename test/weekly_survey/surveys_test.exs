@@ -177,6 +177,15 @@ defmodule WeeklySurvey.SurveysTest do
       assert vote.voteable_id == answer.id
     end
 
+    test "a user can not cast a vote for an answer when another survey answer is voted on" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, answer2} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, _} = Surveys.cast_vote(answer, user: user)
+      {:error, :duplicate_vote} = Surveys.cast_vote(answer2, user: user)
+    end
+
     test "a user can cast a vote for a discussion" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)

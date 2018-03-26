@@ -33,8 +33,19 @@ defmodule WeeklySurvey.Surveys do
   end
 
   def cast_vote(voteable = %{__struct__: struct}, user: user) when is_voteable(struct) do
-    Ecto.build_assoc(voteable, :votes, user_id: user.id)
-      |> Repo.insert(on_conflict: :nothing)
+    duplicate_survey_vote =
+      if struct == Answer do
+        WeeklySurvey.Surveys.Query.DuplicateSurveyVote.vote_exists?(voteable)
+      else
+        false
+      end
+
+    if duplicate_survey_vote do
+      {:error, :duplicate_vote}
+    else
+      Ecto.build_assoc(voteable, :votes, user_id: user.id)
+        |> Repo.insert(on_conflict: :nothing)
+    end
   end
 
   def get_voteable(voteable_type, voteable_id) when is_voteable_string(voteable_type) do
