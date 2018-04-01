@@ -6,8 +6,10 @@
 }
 
 .right { text-align: right; }
+
 .small { font-size: 0.8em; }
-.inline-block:not(.hidden) { 
+
+.inline-block:not(.hidden) {
   display: inline-block;
 }
 
@@ -42,6 +44,10 @@
 
   &__discussion {
     margin-bottom: 15px;
+  }
+
+  &__answer {
+    &:nth-child(even) { background: aliceblue; }
   }
 }
 
