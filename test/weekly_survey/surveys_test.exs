@@ -11,6 +11,7 @@ defmodule WeeklySurvey.SurveysTest do
       assert survey.id
       assert survey.name == "Test"
       assert survey.question == "A question?"
+      assert NaiveDateTime.diff(survey.active_until, Utils.Time.days_from_now(7), :seconds) == 0
     end
 
     test "invalid surveys give an error changeset" do
