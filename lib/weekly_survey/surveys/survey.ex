@@ -8,6 +8,7 @@ defmodule WeeklySurvey.Surveys.Survey do
     field :name, :string
     field :question, :string
     field :has_answer_vote, :boolean, virtual: true
+    field :active_until, :date
     has_many :answers, Answer
 
     timestamps()
