@@ -28,7 +28,7 @@ defmodule WeeklySurveyWeb.Router do
     resources "/votes", VotesController, only: [:create, :delete]
   end
 
-  scope "/admin", WeeklySurveyWeb do
+  scope "/admin", WeeklySurveyWeb.Admin do
     pipe_through [:authenticated, :browser]
 
     get "/", SurveyListController, :index
