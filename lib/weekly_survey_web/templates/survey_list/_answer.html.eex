@@ -19,7 +19,13 @@
   </div>
   <div class="col-2 right">
     <%= if length(@answer.votes) == 1 do %>
-      <span class="voted-badge" data-answer-id="<%= @answer.id %>">Voted!</span>
+      <div class="inline-form">
+        <span class="voted-badge" data-answer-id="<%= @answer.id %>">Voted!</span>
+        <a href="#" class="small">remove</a>
+        <%= form_for @conn, votes_path(@conn, :delete, List.first(@answer.votes).id, voteable_type: "answer"), [method: "DELETE", class: "hidden inline-block"], fn _f -> %>
+          <%= submit "remove" %>
+        <% end %>
+      </div>
     <% else %>
       <%= if !@survey.has_answer_vote do %>
         <div class="inline-form">

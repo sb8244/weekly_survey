@@ -1,7 +1,15 @@
 @import "simple-grid";
 
-.hidden { display: none; }
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
 .right { text-align: right; }
+.small { font-size: 0.8em; }
+.inline-block:not(.hidden) { 
+  display: inline-block;
+}
 
 .alert {
   padding: 15px;
