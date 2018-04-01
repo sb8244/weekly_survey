@@ -77,6 +77,22 @@ defmodule WeeklySurvey.SurveysTest do
   end
 
   describe "get_available_surveys/1" do
+    test "active surveys are returned" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: Utils.Time.seconds_from_now(1)}))
+
+      surveys = Surveys.get_available_surveys(user: user)
+      assert length(surveys) == 1
+    end
+
+    test "inactive surveys are not returned" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: Utils.Time.seconds_from_now(0)}))
+
+      surveys = Surveys.get_available_surveys(user: user)
+      assert length(surveys) == 0
+    end
+
     test "all surveys are returned with answers and discussion (temporary, need to scope to active only)" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})

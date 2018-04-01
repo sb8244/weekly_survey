@@ -25,6 +25,7 @@ defmodule WeeklySurvey.Surveys.Query.AvailableSurveys do
 
     query =
       from s in Survey,
+      where: fragment("?::timestamp", s.active_until) > ^NaiveDateTime.utc_now(),
       order_by: [desc: :id],
       preload: [answers: ^answers_preloading_query]
 

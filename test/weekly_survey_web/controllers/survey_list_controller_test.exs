@@ -54,4 +54,19 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
     assert html =~ ~s(<span class="voted-badge" data-answer-id="#{answer.id}">Voted!</span>)
     refute html =~ ~s(>Vote</a>)
   end
+
+  test "inactive surveys are not displayed", %{session_conn: conn} do
+    {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, survey} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: Utils.Time.days_from_now(-1)}))
+    {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+    {:ok, _} = Surveys.cast_vote(answer, user: user)
+
+    html =
+      conn
+        |> put_session(:user_guid, user.guid)
+        |> get("/")
+        |> html_response(200)
+
+    refute html =~ "A question?"
+  end
 end

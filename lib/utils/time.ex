@@ -1,6 +1,10 @@
 defmodule Utils.Time do
   def days_from_now(days) when is_number(days) do
-    now = NaiveDateTime.utc_now()
-    %{now | day: now.day + days}
+    seconds_from_now(days * 24 * 60 * 60)
+  end
+
+  def seconds_from_now(s) when is_number(s) do
+    NaiveDateTime.utc_now()
+      |> NaiveDateTime.add(s, :seconds)
   end
 end
