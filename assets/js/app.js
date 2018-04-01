@@ -34,7 +34,12 @@ ensureAnonymousSession().then((results) => {
     $(".add-discussion-link--okay").removeClass('hidden');
   } else if (results.userInfoForm) {
     $(".user-info-box__name-link").text("Enter your name");
-    $(".add-discussion-link--prompt").removeClass('hidden');
+    $(".add-discussion-link--prompt")
+      .removeClass('hidden')
+      .on("click", (e) => {
+        e.stopPropagation();
+        $(".user-info-box__name-link").click();
+      });
   }
 });
 
