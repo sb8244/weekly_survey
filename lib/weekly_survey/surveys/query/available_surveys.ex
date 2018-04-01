@@ -4,6 +4,16 @@ defmodule WeeklySurvey.Surveys.Query.AvailableSurveys do
   alias WeeklySurvey.Surveys.{Answer, Discussion, Survey, Vote}
 
   def get_available_surveys(user: user) do
+    query =
+      from s in Survey,
+      where: fragment("?::timestamp", s.active_until) > ^NaiveDateTime.utc_now(),
+      order_by: [desc: :id],
+      preload: [answers: ^preload_for_display_query(user)]
+
+    Repo.all(query)
+  end
+
+  defp preload_for_display_query(user) do
     discussion_preloading_query =
       from d in Discussion,
       order_by: [asc: :id],
@@ -18,17 +28,8 @@ defmodule WeeklySurvey.Surveys.Query.AvailableSurveys do
           where: 1 == 0
       end
 
-    answers_preloading_query =
-      from a in Answer,
+    from a in Answer,
       order_by: [asc: :id],
       preload: [discussions: ^discussion_preloading_query, votes: ^answers_votes_preloads]
-
-    query =
-      from s in Survey,
-      where: fragment("?::timestamp", s.active_until) > ^NaiveDateTime.utc_now(),
-      order_by: [desc: :id],
-      preload: [answers: ^answers_preloading_query]
-
-    Repo.all(query)
   end
 end
