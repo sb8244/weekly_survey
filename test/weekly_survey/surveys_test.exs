@@ -46,8 +46,16 @@ defmodule WeeklySurvey.SurveysTest do
   end
 
   describe "add_discussion_to_answer/2" do
+    test "user info is required to add a discussion" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:error, :no_info} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
+    end
+
     test "a valid discussion is added to an answer" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
@@ -58,6 +66,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "a valid discussion is added to an answer by id" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
@@ -69,6 +78,7 @@ defmodule WeeklySurvey.SurveysTest do
   describe "get_available_surveys/1" do
     test "all surveys are returned with answers and discussion (temporary, need to scope to active only)" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, survey2} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer1} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
@@ -92,7 +102,6 @@ defmodule WeeklySurvey.SurveysTest do
       {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
-      {:ok, _} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
       {:ok, _} = Surveys.cast_vote(answer, user: user)
       {:ok, _} = Surveys.cast_vote(answer, user: user2)
 
@@ -107,6 +116,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "votes by all users for discussions are returned" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
@@ -127,7 +137,6 @@ defmodule WeeklySurvey.SurveysTest do
       {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
-      {:ok, _} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
       {:ok, _} = Surveys.cast_vote(answer, user: user)
       {:ok, _} = Surveys.cast_vote(answer, user: user2)
 
@@ -150,6 +159,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "a discussion is found" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
@@ -201,6 +211,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "a user can cast a vote for a discussion" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
@@ -243,6 +254,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "a discussion vote can be removed" do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)

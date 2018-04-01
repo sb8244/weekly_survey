@@ -18,5 +18,9 @@ defmodule WeeklySurveyWeb.DiscussionController do
 
   defp add_discussion_to_answer(conn: %{assigns: %{user: user}}, params: params = %{"answer_id" => answer_id}) do
     Surveys.add_discussion_to_answer(String.to_integer(answer_id), creation_params(params), user: user)
+      |> case do
+        {:error, :no_info} -> {:error, fake_ecto_error("please", "enter your name")}
+        result -> result
+      end
   end
 end

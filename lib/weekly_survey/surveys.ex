@@ -24,8 +24,12 @@ defmodule WeeklySurvey.Surveys do
   end
 
   def add_discussion_to_answer(answer_id, params = %{}, user: user = %User{}) when is_number(answer_id) do
-    Discussion.changeset(%Discussion{}, Map.merge(params, %{answer_id: answer_id, user_id: user.id}))
-      |> Repo.insert()
+    with %User{user_info: info} when not is_nil(info) <- Repo.preload(user, :user_info),
+         changeset <- Discussion.changeset(%Discussion{}, Map.merge(params, %{answer_id: answer_id, user_id: user.id})) do
+           Repo.insert(changeset)
+         else
+           %User{user_info: nil} -> {:error, :no_info}
+         end
   end
 
   def get_available_surveys(user: user) do

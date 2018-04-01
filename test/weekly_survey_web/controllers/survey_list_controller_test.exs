@@ -17,8 +17,9 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
 
   test "a survey, answers, and discussions are all rendererd", %{conn: conn} do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "X"})
     {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-    {:ok, _info} = WeeklySurvey.Users.set_user_info(user2, %{name: "The Tester"})
+    {:ok, _} = WeeklySurvey.Users.set_user_info(user2, %{name: "The Tester"})
     {:ok, survey} = Surveys.create_survey(@valid_survey_params)
     {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
     {:ok, answer2} = Surveys.add_answer_to_survey(survey, %{answer: "B Answer"}, user: user)
@@ -34,7 +35,7 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
     assert html =~ answer2.answer
     assert html =~ discussion1.content
     assert html =~ discussion2.content
-    assert html =~ "by unknown"
+    assert html =~ "by X"
     assert html =~ "by The Tester"
   end
 

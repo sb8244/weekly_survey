@@ -13,8 +13,23 @@ defmodule WeeklySurveyWeb.DiscussionControllerTest do
         |> text_response(403) =~ "You must be authenticated"
     end
 
+    test "a user must have a name to post a discussion", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+
+      response =
+        conn
+          |> put_session(:user_guid, user.guid)
+          |> post(discussion_path(conn, :create), content: "testing", answer_id: to_string(answer.id))
+
+      assert redirected_to(response, 302) == "/"
+      assert get_flash(response, :error) == "Your discussion was not added: please enter your name"
+    end
+
     test "valid params create an discussion", %{session_conn: conn} do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
 
@@ -31,6 +46,7 @@ defmodule WeeklySurveyWeb.DiscussionControllerTest do
 
     test "invalid params return an error", %{session_conn: conn} do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
 
       response = conn
         |> put_session(:user_guid, user.guid)

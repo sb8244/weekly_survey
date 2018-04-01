@@ -71,6 +71,7 @@ defmodule WeeklySurveyWeb.VotesControllerTest do
 
     test "a vote is added for a discussion", %{session_conn: conn} do
       {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
       {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "A Discuss"}, user: user)
