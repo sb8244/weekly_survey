@@ -31,15 +31,17 @@ ensureAnonymousSession().then((results) => {
   if (results.userInfo) {
     $(".user-info-box__name-link").text(results.userInfo.name);
     $(".user-info-box input[name='name']").val(results.userInfo.name);
+    $(".add-discussion-link--okay").removeClass('hidden');
   } else if (results.userInfoForm) {
     $(".user-info-box__name-link").text("Enter your name");
+    $(".add-discussion-link--prompt").removeClass('hidden');
   }
 });
 
 $(document.body).on('click', '.inline-form a', (e) => {
   e.preventDefault();
 
-  const link = $(e.target);
+  const link = $(e.currentTarget);
   const form = link.parent().find('form');
   form.removeClass('hidden');
   link.addClass('hidden');
