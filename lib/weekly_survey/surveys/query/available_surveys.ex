@@ -25,7 +25,7 @@ defmodule WeeklySurvey.Surveys.Query.AvailableSurveys do
 
     query =
       from s in Survey,
-      order_by: [asc: :id],
+      order_by: [desc: :id],
       preload: [answers: ^answers_preloading_query]
 
     Repo.all(query)

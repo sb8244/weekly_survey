@@ -78,13 +78,13 @@ defmodule WeeklySurvey.SurveysTest do
       surveys = Surveys.get_available_surveys(user: user)
       assert length(surveys) == 2
 
-      assert Enum.at(surveys, 0).id == survey.id
-      assert Enum.at(surveys, 1).id == survey2.id
-      assert Enum.at(surveys, 0).answers |> Enum.map(& &1.id) == [answer1.id, answer2.id]
-      assert Enum.at(surveys, 1).answers == []
+      assert Enum.at(surveys, 0).id == survey2.id
+      assert Enum.at(surveys, 1).id == survey.id
+      assert Enum.at(surveys, 1).answers |> Enum.map(& &1.id) == [answer1.id, answer2.id]
+      assert Enum.at(surveys, 0).answers == []
 
       discussion1 = Repo.preload(discussion1, :votes)
-      assert surveys |> Enum.at(0) |> Map.get(:answers) |> Enum.at(0) |> Map.get(:discussions) == [discussion1]
+      assert surveys |> Enum.at(1) |> Map.get(:answers) |> Enum.at(0) |> Map.get(:discussions) == [discussion1]
     end
 
     test "votes by the current user for answers only are returned" do
