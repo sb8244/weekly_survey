@@ -83,7 +83,7 @@ defmodule WeeklySurvey.SurveysTest do
       assert Enum.at(surveys, 1).answers |> Enum.map(& &1.id) == [answer1.id, answer2.id]
       assert Enum.at(surveys, 0).answers == []
 
-      discussion1 = Repo.preload(discussion1, :votes)
+      discussion1 = discussion1 |> Repo.preload(:votes) |> Repo.preload(user: [:user_info])
       assert surveys |> Enum.at(1) |> Map.get(:answers) |> Enum.at(0) |> Map.get(:discussions) == [discussion1]
     end
 

@@ -46,6 +46,10 @@
     margin-bottom: 15px;
   }
 
+  &__discussion-content {
+    white-space: pre-line;
+  }
+
   &__answer {
     &:nth-child(even) { background: aliceblue; }
   }
@@ -54,5 +58,11 @@
 .user-info-box {
   &--top-right {
     float: right;
+  }
+}
+
+.discussion-form {
+  &__content {
+    width: 100%;
   }
 }

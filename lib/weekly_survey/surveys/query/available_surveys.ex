@@ -7,7 +7,7 @@ defmodule WeeklySurvey.Surveys.Query.AvailableSurveys do
     discussion_preloading_query =
       from d in Discussion,
       order_by: [asc: :id],
-      preload: [:votes]
+      preload: [:votes, user: [:user_info]]
 
     answers_votes_preloads =
       if user != nil do

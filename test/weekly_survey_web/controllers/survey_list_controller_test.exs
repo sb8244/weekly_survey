@@ -17,11 +17,13 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
 
   test "a survey, answers, and discussions are all rendererd", %{conn: conn} do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+    {:ok, _info} = WeeklySurvey.Users.set_user_info(user2, %{name: "The Tester"})
     {:ok, survey} = Surveys.create_survey(@valid_survey_params)
     {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
     {:ok, answer2} = Surveys.add_answer_to_survey(survey, %{answer: "B Answer"}, user: user)
     {:ok, discussion1} = Surveys.add_discussion_to_answer(answer, %{content: "A Discuss"}, user: user)
-    {:ok, discussion2} = Surveys.add_discussion_to_answer(answer, %{content: "B Discuss"}, user: user)
+    {:ok, discussion2} = Surveys.add_discussion_to_answer(answer, %{content: "B Discuss"}, user: user2)
 
     html =
       conn
@@ -32,6 +34,8 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
     assert html =~ answer2.answer
     assert html =~ discussion1.content
     assert html =~ discussion2.content
+    assert html =~ "by unknown"
+    assert html =~ "by The Tester"
   end
 
   test "the user answer vote is shown on the screen and the other answer vote options are removed", %{session_conn: conn} do
