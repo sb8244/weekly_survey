@@ -209,4 +209,41 @@ defmodule WeeklySurvey.SurveysTest do
       assert vote2.id == nil
     end
   end
+
+  describe "remove_vote/3" do
+    test "a valid answer vote can be removed" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+      :ok = Surveys.remove_vote("answer", vote.id, user: user)
+    end
+
+    test "another user's vote can't be removed" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+      {:error, :not_found} = Surveys.remove_vote("answer", vote.id, user: user2)
+    end
+
+    test "a discussion vote can be removed" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(discussion, user: user)
+      :ok = Surveys.remove_vote("discussion", vote.id, user: user)
+    end
+
+
+    test "an unknown voteable type can't be removed" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+
+      assert_raise(FunctionClauseError, fn ->
+        Surveys.remove_vote("nope", 0, user: user)
+      end)
+    end
+  end
 end

@@ -84,4 +84,36 @@ defmodule WeeklySurveyWeb.VotesControllerTest do
       assert discussion.votes |> length() == 1
     end
   end
+
+  describe "DELETE /votes/:id" do
+    test "a valid vote can be deleted", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+
+      assert conn
+        |> put_session(:user_guid, user.guid)
+        |> delete(votes_path(conn, :delete, vote.id), voteable_type: "answer")
+        |> redirected_to(302) == "/"
+
+      assert Repo.aggregate({"answers_votes", Surveys.Vote}, :count, :id) == 0
+    end
+
+    test "a vote by another user cannot be deleted", %{session_conn: conn} do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
+      {:ok, vote} = Surveys.cast_vote(answer, user: user)
+
+      response =
+        conn
+          |> put_session(:user_guid, user2.guid)
+          |> delete(votes_path(conn, :delete, vote.id), voteable_type: "answer")
+
+      assert get_flash(response, :error) == "Your vote was not removed: vote was not found"
+      assert Repo.aggregate({"answers_votes", Surveys.Vote}, :count, :id) == 1
+    end
+  end
 end

@@ -1,5 +1,5 @@
 defmodule WeeklySurvey.Surveys do
-  alias WeeklySurvey.Surveys.{Answer, Discussion, Query.AvailableSurveys, Survey, Vote}
+  alias WeeklySurvey.Surveys.{Answer, Discussion, Query.AvailableSurveys, Query.RemoveVote, Survey, Vote}
   alias WeeklySurvey.Repo
   alias WeeklySurvey.Users.User
 
@@ -46,6 +46,14 @@ defmodule WeeklySurvey.Surveys do
       Ecto.build_assoc(voteable, :votes, user_id: user.id)
         |> Repo.insert(on_conflict: :nothing)
     end
+  end
+
+  def remove_vote(voteable_type, vote_id, user: user) do
+    RemoveVote.remove_vote(voteable_type, vote_id, user: user)
+      |> case do
+        removed_count when removed_count >= 1 -> :ok
+        0 -> {:error, :not_found}
+      end
   end
 
   def get_voteable(voteable_type, voteable_id) when is_voteable_string(voteable_type) do

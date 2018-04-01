@@ -12,6 +12,8 @@ defmodule WeeklySurvey.Surveys.Vote do
 
   def get_voteable_module("answer"), do: Answer
   def get_voteable_module("discussion"), do: Discussion
+  def get_voteable_table("answer"), do: "answers_votes"
+  def get_voteable_table("discussion"), do: "discussions_votes"
 
   schema "abstract table: votes" do
     field :voteable_id, :integer
