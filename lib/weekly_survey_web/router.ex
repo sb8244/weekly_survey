@@ -9,6 +9,10 @@ defmodule WeeklySurveyWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :authenticated do
+    plug WeeklySurveyWeb.Plug.BasicAuth
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -22,6 +26,12 @@ defmodule WeeklySurveyWeb.Router do
     resources "/discussions", DiscussionController, only: [:create]
     resources "/user_info", UsersInfoController, only: [:update], singleton: true
     resources "/votes", VotesController, only: [:create, :delete]
+  end
+
+  scope "/admin", WeeklySurveyWeb do
+    pipe_through [:authenticated, :browser]
+
+    get "/", SurveyListController, :index
   end
 
   # Other scopes may use custom stacks.
