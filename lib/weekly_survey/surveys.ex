@@ -35,7 +35,7 @@ defmodule WeeklySurvey.Surveys do
   def cast_vote(voteable = %{__struct__: struct}, user: user) when is_voteable(struct) do
     duplicate_survey_vote =
       if struct == Answer do
-        WeeklySurvey.Surveys.Query.DuplicateSurveyVote.vote_exists?(voteable)
+        WeeklySurvey.Surveys.Query.DuplicateSurveyVote.vote_exists?(voteable, user: user)
       else
         false
       end
