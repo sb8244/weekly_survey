@@ -1,8 +1,12 @@
 defmodule WeeklySurveyWeb.Plug.BasicAuth do
   import Plug.Conn
-  @realm "Basic realm=\"My Admin\""
+  @realm "Basic realm=\"Survey Admin\""
 
   def init([]), do: []
+
+  def call(conn = %{private: %{basic_auth_skip_admin: true}}, correct_auth) do
+    conn
+  end
 
   def call(conn, correct_auth) do
     case get_req_header(conn, "authorization") do

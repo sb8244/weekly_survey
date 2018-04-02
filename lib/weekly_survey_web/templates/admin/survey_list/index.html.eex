@@ -1,6 +1,6 @@
 <div class="container">
   <div class="title-wrapper">
-    <h2>Available Surveys</h2>
+    <h2>Surveys</h2>
 
     <div class="inline-form user-info-box--top-right">
       <a class="user-info-box__name-link" href="#"></a>
@@ -14,7 +14,17 @@
 
   <%= for survey <- @surveys do %>
     <div class="survey-wrapper">
-      <h3><%= survey.question %></h3>
+      <h3>
+        <strong>
+          <%= if survey_active?(survey) do %>
+            (Active)
+          <% else %>
+            (Expired)
+          <% end %>
+        </strong>
+
+        <%= survey.question %>
+      </h3>
 
       <div class="row survey-answers__header">
         <div class="col-5">Ideas</div>

@@ -5,75 +5,9 @@ defmodule WeeklySurvey.SurveysTest do
 
   @valid_survey_params %{name: "Test", question: "A question?"}
 
-  describe "create_survey/1" do
-    test "a valid survey is created" do
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      assert survey.id
-      assert survey.name == "Test"
-      assert survey.question == "A question?"
-      assert NaiveDateTime.diff(survey.active_until, Utils.Time.days_from_now(7), :seconds) == 0
-    end
-
-    test "invalid surveys give an error changeset" do
-      {:error, changeset} = Surveys.create_survey(%{name: "", question: ""})
-      assert changeset.errors |> Keyword.keys == [:name, :question]
-    end
-  end
-
-  describe "add_answer_to_survey/2" do
-    test "a valid answer is added to a survey" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
-      assert answer.id
-      assert answer.survey_id == survey.id
-      assert answer.answer == "Answer"
-    end
-
-    test "a survey_id can be used" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
-      assert answer.id
-      assert answer.survey_id == survey.id
-    end
-
-    test "an invalid survey_id is an error" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:error, changeset} = Surveys.add_answer_to_survey(survey.id + 1, %{answer: "Answer"}, user: user)
-      assert changeset.errors |> Keyword.keys == [:survey_id]
-    end
-  end
-
-  describe "add_discussion_to_answer/2" do
-    test "user info is required to add a discussion" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
-      {:error, :no_info} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
-    end
-
-    test "a valid discussion is added to an answer" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
-      {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
-      assert discussion.id
-      assert discussion.answer_id == answer.id
-      assert discussion.content == "Discuss"
-    end
-
-    test "a valid discussion is added to an answer by id" do
-      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
-      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
-      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
-      assert discussion.id
-      assert discussion.answer_id == answer.id
-    end
+  def valid_survey_params(params = %{}) do
+    @valid_survey_params
+      |> Map.merge(params)
   end
 
   describe "get_available_surveys/1" do
@@ -163,6 +97,117 @@ defmodule WeeklySurvey.SurveysTest do
 
       votes = answers |> Enum.at(0) |> Map.get(:votes)
       assert length(votes) == 0
+    end
+  end
+
+  describe "admin_get_survey_list/0" do
+    test "all recent surveys are included, with votes (plus user information), sorted by vote_count" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user_info} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
+      {:ok, user2} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, user3} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+
+      {:ok, survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      {:ok, survey2} = Surveys.create_survey(valid_survey_params(%{question: "Two"}))
+      {:ok, expired_survey} = Surveys.create_survey(valid_survey_params(%{active_until: Utils.Time.seconds_from_now(-1), question: "Three"}))
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "One"}, user: user)
+      {:ok, answer2} = Surveys.add_answer_to_survey(survey, %{answer: "Two"}, user: user)
+      {:ok, answer3} = Surveys.add_answer_to_survey(survey, %{answer: "Three"}, user: user)
+      {:ok, _} = Surveys.cast_vote(answer3, user: user)
+      {:ok, _} = Surveys.cast_vote(answer3, user: user2)
+      {:ok, _} = Surveys.cast_vote(answer2, user: user3)
+
+      surveys = Surveys.admin_get_survey_list()
+      assert length(surveys) == 3
+      # Newest should be first
+      assert Enum.map(surveys, & &1.id) == [expired_survey.id, survey2.id, survey.id]
+
+      retrieved_survey = Enum.at(surveys, 2)
+      assert Enum.map(retrieved_survey.answers, & &1.id) == [answer3.id, answer2.id, answer.id]
+      assert Enum.map(retrieved_survey.answers, & &1.vote_count) == [2, 1, 0]
+      first_vote = retrieved_survey.answers |> List.first() |> Map.get(:votes) |> List.first()
+      assert first_vote |> Map.get(:user) |> Map.get(:user_info) == user_info
+    end
+
+    test "surveys that ended > 90 days ago are not displayed" do
+      {:ok, survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      {:ok, survey2} = Surveys.create_survey(valid_survey_params(%{active_until: Utils.Time.days_from_now(-89), question: "Two"}))
+      {:ok, _expired_survey} = Surveys.create_survey(valid_survey_params(%{active_until: Utils.Time.days_from_now(-90), question: "Three"}))
+
+      surveys = Surveys.admin_get_survey_list()
+      assert length(surveys) == 2
+      assert Enum.map(surveys, & &1.id) == [survey2.id, survey.id]
+    end
+  end
+
+  describe "create_survey/1" do
+    test "a valid survey is created" do
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      assert survey.id
+      assert survey.name == "Test"
+      assert survey.question == "A question?"
+      assert NaiveDateTime.diff(survey.active_until, Utils.Time.days_from_now(7), :seconds) == 0
+    end
+
+    test "invalid surveys give an error changeset" do
+      {:error, changeset} = Surveys.create_survey(%{name: "", question: ""})
+      assert changeset.errors |> Keyword.keys == [:name, :question]
+    end
+  end
+
+  describe "add_answer_to_survey/2" do
+    test "a valid answer is added to a survey" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      assert answer.id
+      assert answer.survey_id == survey.id
+      assert answer.answer == "Answer"
+    end
+
+    test "a survey_id can be used" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey.id, %{answer: "Answer"}, user: user)
+      assert answer.id
+      assert answer.survey_id == survey.id
+    end
+
+    test "an invalid survey_id is an error" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:error, changeset} = Surveys.add_answer_to_survey(survey.id + 1, %{answer: "Answer"}, user: user)
+      assert changeset.errors |> Keyword.keys == [:survey_id]
+    end
+  end
+
+  describe "add_discussion_to_answer/2" do
+    test "user info is required to add a discussion" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:error, :no_info} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
+    end
+
+    test "a valid discussion is added to an answer" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer, %{content: "Discuss"}, user: user)
+      assert discussion.id
+      assert discussion.answer_id == answer.id
+      assert discussion.content == "Discuss"
+    end
+
+    test "a valid discussion is added to an answer by id" do
+      {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
+      {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "Test"})
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "Answer"}, user: user)
+      {:ok, discussion} = Surveys.add_discussion_to_answer(answer.id, %{content: "Discuss"}, user: user)
+      assert discussion.id
+      assert discussion.answer_id == answer.id
     end
   end
 

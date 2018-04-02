@@ -7,6 +7,7 @@ defmodule WeeklySurvey.Surveys.Vote do
   end
 
   alias WeeklySurvey.Surveys.{Answer, Discussion}
+  alias WeeklySurvey.Users.User
 
   use Ecto.Schema
 
@@ -17,7 +18,7 @@ defmodule WeeklySurvey.Surveys.Vote do
 
   schema "abstract table: votes" do
     field :voteable_id, :integer
-    field :user_id, :id
+    belongs_to :user, User
 
     timestamps()
   end

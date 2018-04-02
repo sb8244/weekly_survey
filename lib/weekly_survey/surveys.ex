@@ -1,9 +1,17 @@
 defmodule WeeklySurvey.Surveys do
-  alias WeeklySurvey.Surveys.{Answer, Discussion, Query.AvailableSurveys, Query.RemoveVote, Survey, Vote}
+  alias WeeklySurvey.Surveys.{Answer, Discussion, Query.AdminSurveyList, Query.AvailableSurveys, Query.RemoveVote, Survey, Vote}
   alias WeeklySurvey.Repo
   alias WeeklySurvey.Users.User
 
   import Vote.Guards
+
+  def get_available_surveys(user: user) do
+    AvailableSurveys.get_available_surveys(user: user)
+  end
+
+  def admin_get_survey_list() do
+    AdminSurveyList.get_all()
+  end
 
   def create_survey(params = %{}) do
     Survey.changeset(%Survey{}, params)
@@ -30,10 +38,6 @@ defmodule WeeklySurvey.Surveys do
          else
            %User{user_info: nil} -> {:error, :no_info}
          end
-  end
-
-  def get_available_surveys(user: user) do
-    AvailableSurveys.get_available_surveys(user: user)
   end
 
   def cast_vote(voteable = %{__struct__: struct}, user: user) when is_voteable(struct) do

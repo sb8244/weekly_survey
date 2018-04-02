@@ -1,5 +1,7 @@
 <div class="row survey-answers__answer">
-  <div class="col-5"><%= @answer.answer %></div>
+  <div class="col-5">
+    (<%= @answer.vote_count %>) <%= @answer.answer %>
+  </div>
   <div class="col-5">
     <%= for discussion <- @answer.discussions do %>
       <div class="survey-answers__discussion">
@@ -7,42 +9,12 @@
         <small>by <%= user_name(discussion.user) %></small>
       </div>
     <% end %>
-
-    <div class="survey-answers__discussion survey-answers__discussion-form-wrapper">
-      <div class="inline-form">
-        <a href="#">
-          <span class="add-discussion-link--okay hidden">+ Add discussion</span>
-          <span class="add-discussion-link--prompt hidden">Enter name to add discussion</span>
-        </a>
-        <%= form_for @conn, discussion_path(@conn, :create), [class: "hidden discussion-form"], fn f -> %>
-          <%= hidden_input f, :answer_id, value: @answer.id %>
-          <%= textarea f, :content, placeholder: "Why?", required: true, rows: 3, class: "discussion-form__content" %>
-          <button type="button" class="inline-form-close">cancel</button>
-          <%= submit "submit" %>
-        <% end %>
-      </div>
-    </div>
   </div>
   <div class="col-2 right">
-    <%= if length(@answer.votes) == 1 do %>
-      <div class="inline-form">
-        <span class="voted-badge" data-answer-id="<%= @answer.id %>">Voted!</span>
-        <a href="#" class="small">remove</a>
-        <%= form_for @conn, votes_path(@conn, :delete, List.first(@answer.votes).id, voteable_type: "answer"), [method: "DELETE", class: "hidden inline-block"], fn _f -> %>
-          <%= submit "remove" %>
-        <% end %>
-      </div>
-    <% else %>
-      <%= if !@survey.has_answer_vote do %>
-        <div class="inline-form">
-          <a href="#">Vote</a>
-          <%= form_for @conn, votes_path(@conn, :create), [class: "hidden"], fn f -> %>
-            <%= hidden_input f, :voteable_id, value: @answer.id %>
-            <%= hidden_input f, :voteable_type, value: "answer" %>
-            <%= submit "submit" %>
-          <% end %>
-        </div>
+    <ul>
+      <%= for vote <- @answer.votes do %>
+        <li><%= user_name(vote.user) %></li>
       <% end %>
-    <% end %>
+    </ul>
   </div>
 </div>

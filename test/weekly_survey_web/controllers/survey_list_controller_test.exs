@@ -57,7 +57,7 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
 
   test "inactive surveys are not displayed", %{session_conn: conn} do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
-    {:ok, survey} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: Utils.Time.days_from_now(-1)}))
+    {:ok, survey} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: Utils.Time.seconds_from_now(-1)}))
     {:ok, answer} = Surveys.add_answer_to_survey(survey, %{answer: "A Answer"}, user: user)
     {:ok, _} = Surveys.cast_vote(answer, user: user)
 
