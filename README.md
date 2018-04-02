@@ -14,7 +14,7 @@ ADMIN_CREDENTIALS="admin::password||admin2::pass" PORT=4005 mix phx.server
 - [ ] Admin section
 - [ ] - Add a new Survey
 - [ ] - Repeat a survey every week, start / stop on particular time
-- [ ] - View tally of votes
+- [x] - View tally of votes
 
 ## ENV
 
