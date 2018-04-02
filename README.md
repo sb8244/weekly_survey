@@ -12,9 +12,11 @@ ADMIN_CREDENTIALS="admin::password||admin2::pass" PORT=4005 mix phx.server
 - [x] usable prettiness
 - [ ] prettier
 - [ ] Admin section
-- [ ] - Add a new Survey
-- [ ] - Repeat a survey every week, start / stop on particular time
+- [x] - Add a new Survey
+- [ ] - Add with active_until stat
+- [ ] - Update existing survey (question, active_until)
 - [x] - View tally of votes
+- [hold] - Repeat a survey every week, start / stop on particular time
 
 ## ENV
 
