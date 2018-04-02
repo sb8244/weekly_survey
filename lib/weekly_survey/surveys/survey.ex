@@ -20,7 +20,7 @@ defmodule WeeklySurvey.Surveys.Survey do
 
     survey
     |> cast(attrs, [:name, :question, :active_until])
-    |> validate_required([:name, :question, :active_until])
+    |> validate_required([:question, :active_until])
   end
 
   defp default_active_until(attrs = %{active_until: _}), do: attrs
