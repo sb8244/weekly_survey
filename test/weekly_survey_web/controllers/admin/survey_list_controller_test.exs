@@ -20,7 +20,7 @@ defmodule WeeklySurveyWeb.Admin.SurveyListControllerTest do
         |> get("/admin")
         |> html_response(200)
 
-    assert html =~ "<h2>Surveys</h2>"
+    assert html =~ "<h2>Survey Administration</h2>"
     assert html =~ survey.question
     assert html =~ survey2.question
     assert html =~ expired_survey.question
