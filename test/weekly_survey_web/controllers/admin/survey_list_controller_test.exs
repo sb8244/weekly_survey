@@ -82,4 +82,43 @@ defmodule WeeklySurveyWeb.Admin.SurveyListControllerTest do
       assert get_flash(response, :error) == "Your survey was not added: question can't be blank"
     end
   end
+
+  describe "PUT /admin/surveys/:id" do
+    test "a survey can be updated", %{conn: conn} do
+      {:ok, survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      response =
+        conn
+          |> Plug.Conn.put_private(:basic_auth_skip_admin, true)
+          |> put("/admin/surveys/#{survey.id}", %{question: "Test?", name: "ignored"})
+
+      assert redirected_to(response, 302) == "/admin"
+      assert get_flash(response, :error) == nil
+
+      survey = Repo.get!(WeeklySurvey.Surveys.Survey, survey.id)
+      assert survey.question == "Test?"
+      assert survey.name == "Test?"
+    end
+
+    test "an invalid change is an error", %{conn: conn} do
+      {:ok, survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      response =
+        conn
+          |> Plug.Conn.put_private(:basic_auth_skip_admin, true)
+          |> put("/admin/surveys/#{survey.id}", %{question: ""})
+
+      assert redirected_to(response, 302) == "/admin"
+      assert get_flash(response, :error) == "Your survey was not updated: question can't be blank"
+    end
+
+    test "an invalid id is an error", %{conn: conn} do
+      {:ok, _survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      response =
+        conn
+          |> Plug.Conn.put_private(:basic_auth_skip_admin, true)
+          |> put("/admin/surveys/0", %{question: "valid"})
+
+      assert redirected_to(response, 302) == "/admin"
+      assert get_flash(response, :error) == "Not found"
+    end
+  end
 end

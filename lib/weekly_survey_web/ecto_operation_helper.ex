@@ -9,6 +9,8 @@ defmodule WeeklySurveyWeb.EctoOperationHelper do
 
     case operation.(args) do
       {:ok, _} -> conn
+      {:error, :not_found} ->
+        Phoenix.Controller.put_flash(conn, :error, "Not found")
       {:error, %{errors: errors}} ->
         message = error_reason <> ": " <> get_message_from_errors(errors)
         Phoenix.Controller.put_flash(conn, :error, message)

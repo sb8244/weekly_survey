@@ -32,7 +32,7 @@ defmodule WeeklySurveyWeb.Router do
     pipe_through [:authenticated, :browser]
 
     get "/", SurveyListController, :index
-    resources "/surveys", SurveyListController, only: [:create]
+    resources "/surveys", SurveyListController, only: [:create, :update]
   end
 
   # Other scopes may use custom stacks.

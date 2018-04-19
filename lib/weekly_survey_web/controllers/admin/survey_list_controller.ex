@@ -16,6 +16,11 @@ defmodule WeeklySurveyWeb.Admin.SurveyListController do
       |> redirect(to: admin_survey_list_path(conn, :index))
   end
 
+  def update(conn, params) do
+    handle_ecto_operation(&update_survey/1, [conn: conn, params: update_params(params), id: params["id"]], error_reason: "Your survey was not updated")
+      |> redirect(to: admin_survey_list_path(conn, :index))
+  end
+
   defp get_surveys() do
     WeeklySurvey.Surveys.admin_get_survey_list()
   end
@@ -24,9 +29,15 @@ defmodule WeeklySurveyWeb.Admin.SurveyListController do
     Surveys.create_survey(params)
   end
 
+  defp update_survey(conn: _, params: params, id: id) do
+    Surveys.update_survey(id, params)
+  end
+
   defp creation_params(params) do
     question = Map.get(params, "question")
 
     %{name: question, question: question}
   end
+
+  defp update_params(params), do: creation_params(params)
 end

@@ -18,6 +18,15 @@ defmodule WeeklySurvey.Surveys do
       |> Repo.insert()
   end
 
+  def update_survey(id, params = %{}) do
+    with survey = %Survey{} <- Repo.get(Survey, id),
+         changeset <- Survey.changeset(survey, params) do
+           Repo.update(changeset)
+         else
+           nil -> {:error, :not_found}
+         end
+  end
+
   def add_answer_to_survey(survey = %Survey{}, params, user: user) do
     add_answer_to_survey(survey.id, params, user: user)
   end
