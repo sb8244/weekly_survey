@@ -151,7 +151,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "invalid surveys give an error changeset" do
       {:error, changeset} = Surveys.create_survey(%{name: "", question: ""})
-      assert changeset.errors |> Keyword.keys == [:name, :question]
+      assert changeset.errors |> Keyword.keys == [:question]
     end
   end
 
