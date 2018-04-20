@@ -33,6 +33,17 @@
         </strong>
 
         <%= survey.question %>
+
+        <div class="inline-form">
+          <a href="#">Edit</a>
+          <%= form_for @conn, admin_survey_list_path(@conn, :update, survey.id), [method: "PUT", class: "hidden create-survey-form"], fn f -> %>
+            <small>Question:</small> <%= text_input f, :question, placeholder: "What is the question?", value: survey.question, required: true, class: "create-survey-form__question" %>
+            <%= hidden_input f, :active_until, value: "#{survey.active_until}Z", required: true %>
+            <small>Accept answers until:</small><%= datetime_local_input f, :active_until_local, placeholder: "Accept answers until (your timezone)", required: true, class: "create-survey-form__question" %>
+            <button type="button" class="inline-form-close">cancel</button>
+            <%= submit "submit" %>
+          <% end %>
+        </div>
       </h3>
 
       <div class="row survey-answers__header">

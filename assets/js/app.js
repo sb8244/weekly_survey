@@ -22,6 +22,7 @@ import "phoenix_html"
 
 import $ from 'jquery';
 import ensureAnonymousSession from './services/session';
+import { toDatetimeLocal } from './services/date';
 
 ensureAnonymousSession().then((results) => {
   if (results.retrievalMethod === "jwt") {
@@ -60,4 +61,18 @@ $(document.body).on('click', '.inline-form-close', (e) => {
   const form = $(e.target).parents('.inline-form').find('form');
   form.addClass('hidden');
   link.removeClass('hidden');
+});
+
+// convert local datetime to UTC ISO string
+$(document.body).on('change', 'form input[name="active_until_local"]', (e) => {
+  const date = new Date(e.target.value);
+  $(e.target).parents("form").find('input[name="active_until"]').val(date.toISOString());
+});
+
+// convert UTC ISO string to local datetime
+$('form input[name="active_until"]').each((index, input) => {
+  if (input.value) {
+    const date = new Date(input.value);
+    $(input).parents("form").find('input[name="active_until_local"]').val(toDatetimeLocal(date));
+  }
 });
