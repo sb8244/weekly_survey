@@ -16,15 +16,13 @@ defmodule WeeklySurvey.Surveys.Survey do
 
   @doc false
   def changeset(survey, attrs) do
-    attrs = default_active_until(attrs)
-
     survey
     |> cast(attrs, [:name, :question, :active_until])
     |> validate_required([:question, :active_until])
   end
 
-  defp default_active_until(attrs = %{active_until: _}), do: attrs
-  defp default_active_until(attrs) do
+  def default_active_until(attrs = %{active_until: _}), do: attrs
+  def default_active_until(attrs) do
     Map.put(attrs, :active_until, Utils.Time.days_from_now(7))
   end
 end

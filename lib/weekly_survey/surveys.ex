@@ -14,6 +14,8 @@ defmodule WeeklySurvey.Surveys do
   end
 
   def create_survey(params = %{}) do
+    params = Survey.default_active_until(params)
+
     Survey.changeset(%Survey{}, params)
       |> Repo.insert()
   end

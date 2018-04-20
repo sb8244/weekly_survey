@@ -62,14 +62,16 @@ defmodule WeeklySurveyWeb.Admin.SurveyListControllerTest do
       response =
         conn
           |> Plug.Conn.put_private(:basic_auth_skip_admin, true)
-          |> post("/admin/surveys", %{question: "Test?"})
+          |> post("/admin/surveys", %{question: "Test?", active_until: "2018-04-20T03:34:46.867Z"})
 
       assert redirected_to(response, 302) == "/admin"
       assert get_flash(response, :error) == nil
 
       survey = Repo.one!(from x in WeeklySurvey.Surveys.Survey, order_by: [desc: x.id], limit: 1)
+      {:ok, expected_date} = NaiveDateTime.from_iso8601("2018-04-20T03:34:46.867000Z")
       assert survey.name == "Test?"
       assert survey.question == survey.name
+      assert survey.active_until == expected_date
     end
 
     test "invalid params are an error", %{conn: conn} do
@@ -94,9 +96,26 @@ defmodule WeeklySurveyWeb.Admin.SurveyListControllerTest do
       assert redirected_to(response, 302) == "/admin"
       assert get_flash(response, :error) == nil
 
-      survey = Repo.get!(WeeklySurvey.Surveys.Survey, survey.id)
-      assert survey.question == "Test?"
-      assert survey.name == "Test?"
+      updated_survey = Repo.get!(WeeklySurvey.Surveys.Survey, survey.id)
+      assert updated_survey.question == "Test?"
+      assert updated_survey.name == "Test?"
+      assert updated_survey.active_until == survey.active_until
+    end
+
+    test "active_until can be updated", %{conn: conn} do
+      {:ok, survey} = Surveys.create_survey(valid_survey_params(%{question: "One"}))
+      response =
+        conn
+          |> Plug.Conn.put_private(:basic_auth_skip_admin, true)
+          |> put("/admin/surveys/#{survey.id}", %{active_until: "2018-04-20T03:34:46.867Z"})
+
+      assert redirected_to(response, 302) == "/admin"
+      assert get_flash(response, :error) == nil
+
+      updated_survey = Repo.get!(WeeklySurvey.Surveys.Survey, survey.id)
+      {:ok, expected_date} = NaiveDateTime.from_iso8601("2018-04-20T03:34:46.867000Z")
+      assert updated_survey.question == "One"
+      assert updated_survey.active_until == expected_date
     end
 
     test "an invalid change is an error", %{conn: conn} do

@@ -34,9 +34,21 @@ defmodule WeeklySurveyWeb.Admin.SurveyListController do
   end
 
   defp creation_params(params) do
-    question = Map.get(params, "question")
+    allowed_params = %{}
 
-    %{name: question, question: question}
+    allowed_params =
+      case Map.get(params, "question") do
+        nil -> allowed_params
+        question -> Map.merge(allowed_params, %{name: question, question: question})
+      end
+
+    allowed_params =
+      case Map.get(params, "active_until") do
+        nil -> allowed_params
+        date -> Map.merge(allowed_params, %{active_until: params["active_until"]})
+      end
+
+    allowed_params
   end
 
   defp update_params(params), do: creation_params(params)

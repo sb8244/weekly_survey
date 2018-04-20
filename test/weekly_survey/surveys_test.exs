@@ -141,7 +141,7 @@ defmodule WeeklySurvey.SurveysTest do
   end
 
   describe "create_survey/1" do
-    test "a valid survey is created" do
+    test "a valid survey is created with a default active_until" do
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
       assert survey.id
       assert survey.name == "Test"
@@ -149,8 +149,37 @@ defmodule WeeklySurvey.SurveysTest do
       assert NaiveDateTime.diff(survey.active_until, Utils.Time.days_from_now(7), :seconds) == 0
     end
 
+    test "active_until can be set to an iso8601 string" do
+      {:ok, survey} = Surveys.create_survey(Map.merge(@valid_survey_params, %{active_until: "2018-04-19T00:00:00.123Z"}))
+      {:ok, expected_date} = NaiveDateTime.from_iso8601("2018-04-19T00:00:00.123Z")
+      assert survey.active_until == expected_date
+    end
+
     test "invalid surveys give an error changeset" do
       {:error, changeset} = Surveys.create_survey(%{name: "", question: ""})
+      assert changeset.errors |> Keyword.keys == [:question]
+    end
+  end
+
+  describe "update_survey/1" do
+    test "a valid survey is updated with only the passed fields" do
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, updated_survey} = Surveys.update_survey(survey.id, %{question: "Updated"})
+      assert updated_survey.id
+      assert updated_survey.question == "Updated"
+      assert NaiveDateTime.diff(survey.active_until, Utils.Time.days_from_now(7), :seconds) == 0
+    end
+
+    test "active_until can be set to an iso8601 string" do
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:ok, updated_survey} = Surveys.update_survey(survey.id, %{active_until: "2018-04-19T00:00:00.123Z"})
+      {:ok, expected_date} = NaiveDateTime.from_iso8601("2018-04-19T00:00:00.123Z")
+      assert updated_survey.active_until == expected_date
+    end
+
+    test "invalid surveys give an error changeset" do
+      {:ok, survey} = Surveys.create_survey(@valid_survey_params)
+      {:error, changeset} = Surveys.update_survey(survey.id, %{question: ""})     
       assert changeset.errors |> Keyword.keys == [:question]
     end
   end
