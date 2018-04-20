@@ -16,6 +16,8 @@
     <a href="#">+ Create Survey</a>
     <%= form_for @conn, admin_survey_list_path(@conn, :create), [class: "hidden create-survey-form"], fn f -> %>
       <%= text_input f, :question, placeholder: "What is the question?", required: true, class: "create-survey-form__question" %>
+      <%= hidden_input f, :active_until, value: "#{@active_until}Z", required: true %>
+      <small>Accept answers until:</small><%= datetime_local_input f, :active_until_local, required: true, class: "create-survey-form__question" %>
       <button type="button" class="inline-form-close">cancel</button>
       <%= submit "submit" %>
     <% end %>

@@ -8,6 +8,7 @@ defmodule WeeklySurveyWeb.Admin.SurveyListController do
   def index(conn, _params) do
     conn
       |> assign(:surveys, get_surveys())
+      |> assign(:active_until, Utils.Time.days_from_now(7) |> Map.put(:second, 0))
       |> render("index.html")
   end
 
@@ -45,7 +46,7 @@ defmodule WeeklySurveyWeb.Admin.SurveyListController do
     allowed_params =
       case Map.get(params, "active_until") do
         nil -> allowed_params
-        date -> Map.merge(allowed_params, %{active_until: params["active_until"]})
+        date -> Map.merge(allowed_params, %{active_until: date})
       end
 
     allowed_params
