@@ -119,10 +119,10 @@ defmodule WeeklySurvey.SurveysTest do
 
       surveys = Surveys.admin_get_survey_list()
       assert length(surveys) == 3
-      # Newest should be first
-      assert Enum.map(surveys, & &1.id) == [expired_survey.id, survey2.id, survey.id]
+      # Active should be first
+      assert Enum.map(surveys, & &1.id) == [survey2.id, survey.id, expired_survey.id]
 
-      retrieved_survey = Enum.at(surveys, 2)
+      retrieved_survey = Enum.at(surveys, 1)
       assert Enum.map(retrieved_survey.answers, & &1.id) == [answer3.id, answer2.id, answer.id]
       assert Enum.map(retrieved_survey.answers, & &1.vote_count) == [2, 1, 0]
       first_vote = retrieved_survey.answers |> List.first() |> Map.get(:votes) |> List.first()
@@ -136,7 +136,7 @@ defmodule WeeklySurvey.SurveysTest do
 
       surveys = Surveys.admin_get_survey_list()
       assert length(surveys) == 2
-      assert Enum.map(surveys, & &1.id) == [survey2.id, survey.id]
+      assert Enum.map(surveys, & &1.id) == [survey.id, survey2.id]
     end
   end
 
@@ -179,7 +179,7 @@ defmodule WeeklySurvey.SurveysTest do
 
     test "invalid surveys give an error changeset" do
       {:ok, survey} = Surveys.create_survey(@valid_survey_params)
-      {:error, changeset} = Surveys.update_survey(survey.id, %{question: ""})     
+      {:error, changeset} = Surveys.update_survey(survey.id, %{question: ""})
       assert changeset.errors |> Keyword.keys == [:question]
     end
   end

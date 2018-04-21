@@ -17,7 +17,7 @@ ADMIN_CREDENTIALS="admin::password||admin2::pass" PORT=4005 mix phx.server
 - [x] - Update existing survey (question, active_until)
 - [x] - View tally of votes
 - [hold] - Repeat a survey every week, start / stop on particular time
-- [ ] - Setting active until moves it to not being active anymore (if in past or in future opposite)
+- [x] - Setting active until moves it to not being active anymore (if in past or in future opposite)
 
 ## ENV
 

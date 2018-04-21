@@ -7,6 +7,6 @@ defmodule WeeklySurveyWeb.Admin.SurveyListView do
   end
 
   def survey_active?(survey) do
-    survey.active_until > Utils.Time.now()
+    NaiveDateTime.compare(survey.active_until, Utils.Time.now()) == :gt
   end
 end

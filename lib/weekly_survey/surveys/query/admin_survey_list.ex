@@ -7,7 +7,7 @@ defmodule WeeklySurvey.Surveys.Query.AdminSurveyList do
     query =
       from s in Survey,
       where: fragment("?::timestamp", s.active_until) > ^Utils.Time.days_from_now(-90),
-      order_by: [desc: :id],
+      order_by: [desc: :active_until, desc: :id],
       preload: [answers: ^preload_for_display_query()]
 
     Repo.all(query)
