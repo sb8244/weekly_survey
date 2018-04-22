@@ -1,17 +1,4 @@
 <div class="container">
-  <div class="title-wrapper">
-    <h2>Available Surveys</h2>
-
-    <div class="inline-form user-info-box--top-right">
-      <a class="user-info-box__name-link" href="#"></a>
-      <%= form_for @conn, users_info_path(@conn, :update), [method: "PUT", class: "hidden user-info-box"], fn f -> %>
-        <%= text_input f, :name, placeholder: "Your name", required: true %>
-        <button type="button" class="inline-form-close">cancel</button>
-        <%= submit "submit" %>
-      <% end %>
-    </div>
-  </div>
-
   <%= for survey <- @surveys do %>
     <div class="survey-wrapper">
       <h3><%= survey.question %></h3>

@@ -13,6 +13,28 @@
   </head>
 
   <body>
+    <header>
+      <div class="header-brand">
+        <div class="brand-wrapper">
+          <a href="/">
+            <img src="/images/logo.svg" alt="SalesLoft Survey" />
+          </a>
+        </div>
+        <div class="brand-text">Weekly Survey</div>
+      </div>
+
+      <div class="header-menu">
+        <div class="inline-form">
+          <a class="user-info-box__name-link" href="#"></a>
+          <%= form_for @conn, users_info_path(@conn, :update), [method: "PUT", class: "hidden user-info-box"], fn f -> %>
+            <%= text_input f, :name, placeholder: "Your name", required: true %>
+            <button type="button" class="inline-form-close">cancel</button>
+            <%= submit "submit" %>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
     <div class="app-container">
       <%= render "_flashes.html", conn: @conn %>
 

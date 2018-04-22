@@ -6,15 +6,6 @@ defmodule WeeklySurveyWeb.SurveyListControllerTest do
 
   @valid_survey_params %{name: "Test", question: "A question?"}
 
-  test "HTML is rendered", %{conn: conn} do
-    html =
-      conn
-        |> get("/")
-        |> html_response(200)
-
-    assert html =~ "<h2>Available Surveys</h2>"
-  end
-
   test "a survey, answers, and discussions are all rendererd", %{conn: conn} do
     {:ok, user} = WeeklySurvey.Users.find_or_create_user(UUID.uuid4())
     {:ok, _} = WeeklySurvey.Users.set_user_info(user, %{name: "X"})
