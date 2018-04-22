@@ -37,6 +37,9 @@ config :phoenix, :template_engines,
 config :weekly_survey, WeeklySurvey.Repo,
   loggers: [Appsignal.Ecto, Ecto.LogEntry]
 
+config :appsignal, :config,
+  active: true
+
 # AppSignal end
 
 # Import environment specific config. This must remain at the bottom
