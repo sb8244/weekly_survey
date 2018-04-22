@@ -2,6 +2,7 @@ defmodule WeeklySurveyWeb.Endpoint do
   @signing_salt "f6hkmFCc"
 
   use Phoenix.Endpoint, otp_app: :weekly_survey
+  use Appsignal.Phoenix
 
   # Serve at "/" the static files from "priv/static" directory.
   #

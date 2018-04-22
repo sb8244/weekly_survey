@@ -25,6 +25,20 @@ config :logger, :console,
 config :weekly_survey, WeeklySurvey.Users.EncryptedGuid,
   secret: "local secret"
 
+# AppSignal begin
+
+config :weekly_survey, WeeklySurveyWeb.Endpoint,
+  instrumenters: [Appsignal.Phoenix.Instrumenter]
+
+config :phoenix, :template_engines,
+  eex: Appsignal.Phoenix.Template.EExEngine,
+  exs: Appsignal.Phoenix.Template.ExsEngine
+
+config :weekly_survey, WeeklySurvey.Repo,
+  loggers: [Appsignal.Ecto, Ecto.LogEntry]
+
+# AppSignal end
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
