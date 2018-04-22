@@ -18,9 +18,6 @@ config :weekly_survey, WeeklySurveyWeb.Endpoint,
   url: [scheme: "https", host: "salesloft-survey.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json",
-  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE")
-
-config :weekly_survey, WeeklySurveyWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE") || throw "No SECRET_KEY_BASE ENV detected"
 
 # Do not print debug messages in production
@@ -34,4 +31,4 @@ config :weekly_survey, WeeklySurvey.Repo,
   ssl: true
 
 config :weekly_survey, WeeklySurvey.Users.EncryptedGuid,
-  secret: Map.fetch!(System.get_env(), "USERS_ENCRYPTION_SECRET")
+  secret: System.get_env("USERS_ENCRYPTION_SECRET") || throw "No USERS_ENCRYPTION_SECRET ENV detected"
