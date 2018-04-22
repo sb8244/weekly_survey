@@ -42,7 +42,8 @@ defmodule WeeklySurvey.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:uuid, "~> 1.1"},
-      {:joken, "~> 1.4"}
+      {:joken, "~> 1.4"},
+      {:appsignal, "~> 1.0"}
     ]
   end
 
