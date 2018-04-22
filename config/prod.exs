@@ -15,8 +15,10 @@ use Mix.Config
 # which you typically run after static files are built.
 config :weekly_survey, WeeklySurveyWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [scheme: "https", host: "salesloft-survey.herokuapp.com", port: 443],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE")
 
 config :weekly_survey, WeeklySurveyWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE") || throw "No SECRET_KEY_BASE ENV detected"
@@ -27,10 +29,9 @@ config :logger, level: :info
 # Configure your database
 config :weekly_survey, WeeklySurvey.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "weekly_survey_prod",
-  pool_size: 15
+  url: System.get_env("DATABASE_URL"),
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "15"),
+  ssl: true
 
 config :weekly_survey, WeeklySurvey.Users.EncryptedGuid,
-  secret: {:system, "USERS_ENCRYPTION_SECRET"}
+  secret: Map.fetch!(System.get_env(), "USERS_ENCRYPTION_SECRET")
