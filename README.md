@@ -10,7 +10,7 @@ ADMIN_CREDENTIALS="admin::password||admin2::pass" PORT=4005 mix phx.server
 - [x] Disallow double vote on same survey
 - [x] When loading from localstorage, refresh the page so that voting is back
 - [x] usable prettiness
-- [ ] prettier
+- [x] prettier
 - [x] Admin section
 - [x] - Add a new Survey
 - [x] - Add with active_until stat
