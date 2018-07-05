@@ -15,7 +15,7 @@
       <div class="row survey-answers__answer-form-wrapper">
         <div class="col-5">
           <div class="inline-form">
-            <a href="#">+ Add Answer</a>
+            <a href="#">+ Add Answer to Question (not vote / reason)</a>
             <%= form_for @conn, answer_path(@conn, :create), [class: "hidden"], fn f -> %>
               <%= hidden_input f, :survey_id, value: survey.id %>
               <%= text_input f, :answer, placeholder: "Your answer", required: true %>

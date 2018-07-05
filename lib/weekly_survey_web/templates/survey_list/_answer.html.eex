@@ -11,7 +11,7 @@
     <div class="survey-answers__discussion survey-answers__discussion-form-wrapper">
       <div class="inline-form">
         <a href="#">
-          <span class="add-discussion-link--okay hidden">+ Add discussion</span>
+          <span class="add-discussion-link--okay hidden">+ Add Reason/Explanation</span>
           <span class="add-discussion-link--prompt hidden">Enter name to add discussion</span>
         </a>
         <%= form_for @conn, discussion_path(@conn, :create), [class: "hidden discussion-form"], fn f -> %>
